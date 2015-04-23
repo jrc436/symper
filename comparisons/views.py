@@ -69,12 +69,13 @@ class IntroView(TemplateView):
 		else:
 			self.request.session['task'] = None
 		self.request.session['turk_id'] = turkid
+		return render(request, self.template_name, self.get_context_data())
 			
 	def genID(self):
 		return random.randint(0, 256000)
 	def get_context_data(self, **kwargs):
 		context = super(IntroView, self).get_context_data(**kwargs)
-		user = models.PUser.objects.get(turk_id = turkid)
+		user = models.PUser.objects.get(turk_id = self.request.session['turk_id'])
 		context['exp_version'] = user.git_revision
 		context['provisional'] = user.provisional
 		context['hitid'] = user.hit_id
