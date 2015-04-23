@@ -1,0 +1,21 @@
+{% if dead %}
+	<p>Thanks for playing. No further action is required.</p>
+{% elif numTasksIncomplete == 0 %} 
+	<p>You have completed all {{ numTasksComplete }} Tasks assigned to you. You are ready to submit back to Amazon!</p>
+	<p>Your stats:</p>
+	<p>Number correct: {{ numCorrect }}</p>
+	<p>Number timed out: {{ numTimeOut }}</p>
+	<p>Number Incorrect: {{ numIncorrect }}</p>
+	<p>Base pay: {{ basepay }}</p>
+	<p>Bonus: {{ bonus }}</p>
+{% else %}
+	<p>You have completed {{ numTasksComplete }}. You have {{ numTasksIncomplete }} remaining. You cannot submit until the task is complete.</p>
+	<p>If you did not mean to see this page, please return to /task/. If you are unable to access the page, you can start from where you left off by re-opening the page from Amazon</p>
+{% endif %}
+
+{% if numTasksIncomplete == 0 %}
+<form action='' method='post'>
+	{% csrf_token %}
+	<button type="submit" name="submission" value="1">Submit!</button>
+</form>
+{% endif %}

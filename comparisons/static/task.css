@@ -1,0 +1,22 @@
+.target {
+	left: 5%;
+	top: 25%;
+	position: absolute;
+}
+.topChoice {
+	left: 50%;
+	top: 5%;
+	position: absolute;
+}
+.bottomChoice {
+	left: 50%;
+	top: 50%;
+	position: absolute;
+}
+.sym_image {
+	margin: 5px;
+	padding: 5px;
+	border: 1px solid #0000ff;
+	height: 40%;
+}
+

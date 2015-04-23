@@ -1,0 +1,30 @@
+<h3><u><span style="font-family: 'Times New Roman'; font-size: medium; font-weight: normal;">Image Matching Study</span></u></h3>
+
+<div class="highlight-box">
+<p>In this task, you will see three images. On the left you will see the <strong>target</strong> image. On the right you will see two possible images to choose from. One of the images is more similar to the target image, but you only have five seconds to decide! You will be paid extra for each image where you correctly identify the one that is more similar. You will complete a total of around 275 of these matches. You will only have <b>FIVE</b> seconds to complete the match, or it will count as a failure! This includes breaks!</p>
+
+<p>This experiment uses COOKIES. Please ensure cookies are enabled before you take the HIT. If at any time during the experiment, your cookie is lost, you will have to re-acquire it by taking the HIT again from Amazon.</p>
+
+<p>This task should work in all browsers, but please report any problems!</p>
+
+<p>You may only complete this HIT once.</p>
+
+<p>We have {{ turkid }} as your Mechanical Turk ID. If this is not you, please report this problem and do not take the HIT.</p>
+
+<p>At the end of the study, you will see a submit button. You must push this button to get your money!</p>
+
+{% if provisional %}
+<p><b>Warning: You are labeled as provisional. This means you will not be paid. Please take the task through the Mechanical Turk interface. If you believe you are seeing this in error, please email jrcole@psu.edu</b></p>
+{% endif %}
+
+<p>We&#39;re&nbsp;researchers at Penn State University in Happy Valley, Pennsylvania.&nbsp;&nbsp;<span style="font-size: 13px; line-height: 1.6em;">Please email jrcole@psu.edu&nbsp;any comments about the task that you have, including any errors and typos that you may have found. &nbsp;Thanks for your interest!</span></p>
+
+<p>Hit ID: {{ hitid }}, Experiment Version: {{ exp_version }}</p> 
+
+<a href="{% url 'task' %}">Click here to begin task</a>
+
+<p>
+<style type="text/css"><!--
+.highlight-box { border:solid 0px #98BE10; background:#FCF9CE; color:#222222; padding:4px; text-align:left; font-size: smaller;}
+</style>
+</p>

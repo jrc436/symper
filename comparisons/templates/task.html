@@ -1,0 +1,16 @@
+{% load staticfiles %}
+
+<link rel="stylesheet" type="text/css" href = "{% static 'task.css' %}" /> 
+
+<h1>Task</h1>
+<form action = '' method='post'>
+{% csrf_token %}
+<input type="image" class="sym_image topChoice" value="top" src="{{ task.choice1.image.url }}" name="top">
+</form>
+
+<form action = '' method='post'>
+{% csrf_token %}
+<input type='image' class="sym_image bottomChoice" value="bottom" src="{{ task.choice2.image.url }}" name="bottom">
+</form>
+
+<img class="sym_image target" src="{{ task.test_image.image.url }}">

@@ -1,0 +1,9 @@
+<h1>Images</h1>
+<ul>
+{% for image in object_list %}
+	<li>{{ image.group }}</li>
+{% empty %}
+	<li>No tasks in db</li>
+{% endfor %}
+</ul>
+
