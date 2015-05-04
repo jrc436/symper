@@ -2,7 +2,7 @@ from django.db import models
 from datetime import datetime
 
 class Image(models.Model):
-	image = models.ImageField()
+	image = models.ImageField(upload_to = "sym_images")
 	P1 = "p1"
 	P2 = "p2"
 	PM = "pm"
@@ -74,7 +74,7 @@ class TaskSet(models.Model):
 
 class PUser(models.Model):
 	turk_id = models.PositiveIntegerField(primary_key=True)
-	taskset = models.ForeignKey(TaskSet)
+	taskset = models.OneToOneField(TaskSet)
 	dead = models.BooleanField(default=False)
 	hit_id = models.PositiveIntegerField(default=1) #the "HIT" this user participated in
 	date = models.DateTimeField(auto_now_add=True)

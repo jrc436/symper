@@ -6,11 +6,13 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 
 urlpatterns = patterns('',
-        url(r'^init/$', views.InitView.as_view(), name='init'),
+        #url(r'^initimages/$', views.InitImagesView.as_view(), name='init'),
+	#url(r'^inittasks/$', views.InitTasksView.as_view(), name='init2'),
+	url(r'^initsets/$', views.InitTaskSetView.as_view(), name='init3'),
 	url(r'^intro/$', views.IntroView.as_view(), name='intro'),
 	url(r'^task/$', views.TaskView.as_view(), name='task'),
 	url(r'^end/$', views.EndView.as_view(), name='end'),
-#	url(r'^images/$', None),
+	url(r'^results/$', views.ResultsView.as_view(), name='results'),
 #	url(r'^media/', None)
 )
 urlpatterns += staticfiles_urlpatterns()
