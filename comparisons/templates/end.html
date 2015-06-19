@@ -6,8 +6,10 @@
 	<p>Number correct: {{ numCorrect }}</p>
 	<p>Number timed out: {{ numTimeOut }}</p>
 	<p>Number Incorrect: {{ numIncorrect }}</p>
+	<p>Timeouts correct: {{ correct_timeout }}</p>
 	<p>Base pay: {{ basepay }}</p>
 	<p>Bonus: {{ bonus }}</p>
+	<p>You are ready to submit! Your HIT will be approved once you click the button.</p>
 {% else %}
 	<p>You have completed {{ numTasksComplete }}. You have {{ numTasksIncomplete }} remaining. You cannot submit until the task is complete.</p>
 	<p>If you did not mean to see this page, please return to /task/. If you are unable to access the page, you can start from where you left off by re-opening the page from Amazon</p>

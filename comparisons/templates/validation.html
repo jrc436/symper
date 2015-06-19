@@ -1,0 +1,8 @@
+<p>{% for payout in allPayouts %}
+	{{ payout.turk_id }},{{ payout.pay }}, {{ payout.bonus }}<br>
+{% endfor %}</p>
+<p> {{ completenum }} </p>
+<p>{% for validation in allValidations %}
+	{{ validation.turk_id }}, {{ validation.percentCorrect }}, {{ validation.percentTop }}, {{ validation.percentBottom }}, {{ validation.percentTimeout }}<br>
+{% endfor %}</p>
+	

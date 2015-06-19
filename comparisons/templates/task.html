@@ -2,7 +2,7 @@
 
 <link rel="stylesheet" type="text/css" href = "/symper/{% static 'task.css' %}" /> 
 
-<h1>Task</h1>
+<h1>Choose the image that's most similar!</h1>
 <form action = '' method='post'>
 {% csrf_token %}
 <input type="image" class="sym_image topChoice" value="top" src="/symper/{{ task.choice1.image.url }}" name="top">

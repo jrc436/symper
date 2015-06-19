@@ -2,13 +2,16 @@ from django.shortcuts import render
 from django.core.urlresolvers import reverse_lazy
 from django.http import HttpResponseRedirect
 from comparisons import models
-import os, random, time, subprocess
+import os, random, time, subprocess, decimal
 from symper import settings
 from django.views.generic import TemplateView, DetailView
 from django.views.generic.list import ListView
 from django.forms.models import model_to_dict
 from util import git_describe
 from itertools import chain
+from boto.mturk import connection
+from boto.mturk.price import Price
+from decimal import Decimal
 
 class EndView(TemplateView):
 	template_name = 'end.html'
@@ -26,8 +29,9 @@ class EndView(TemplateView):
 		context['numCorrect'] = complete.filter(correct=1).count()
 		context['numIncorrect'] = complete.filter(correct=2).count()
 		context['numTimeOut'] = complete.filter(correct=0).count()
-		context['basepay'] = 2.00
-		context['bonus'] = round(2.00 * context['numCorrect'] / (context['numCorrect']+context['numIncorrect']+context['numTimeOut']), 2)
+		context['correct_timeout'] = complete.filter(correct=0).filter(tech_correct=1).count()
+		context['basepay'] = self.getBasePay()
+		context['bonus'] = self.getBonus(user)
 		context['dead'] = user.dead 
 		return context
 	def post(self, request):
@@ -36,7 +40,22 @@ class EndView(TemplateView):
 			user.dead = True
 			user.save()
 		#in this portion, we need to do something with the mturk api
-		return HttpResponseRedirect("https://www.amazon.com")
+		#we want to make absolutely sure that we don't pay the same person twice obviously
+			if not user.provisional and not models.Payout.objects.filter(pk=user.pk).exists():
+				p = self.getBasePay()*100
+				b = self.getBonus(user)*100
+				payout = models.Payout(turk_id = user.turk_id, pay = p, bonus = b) 
+				payout.save()
+				#conn = MTurkConnection()
+				#conn.approve_assignment(user.assignment_id)
+				#grant_bonus(user.turk_id, user.assignment_id, Price(amount =  p.bonus), "performance bonus")
+		return HttpResponseRedirect("https://www.mturk.com/mturk/")
+	def getBasePay(self):
+		return 2.00
+	def getBonus(self, user):
+		complete = models.Result.objects.filter(selector=user)
+		correct = complete.filter(correct=1).count()
+		return max(0.0, round(4.0 * (0.5 - (correct / (correct + complete.filter(correct=0).count() + complete.filter(correct=2).count()))), 2))
 
 
 class IntroView(TemplateView):
@@ -47,18 +66,20 @@ class IntroView(TemplateView):
 		return super(IntroView, self).dispatch(*args, **kwargs)
 
 	def get(self, request):
-		if request.GET.get("hit_id") and request.GET.get("mturk_id"):
+		if request.GET.get("hit_id") and request.GET.get("mturk_id") and request.GET.get("ass_id"):
 			hitid = request.GET["hit_id"]
 			turkid = request.GET["mturk_id"]
+			assid = request.GET["ass_id"]
 			provisional = False
 		else:
 			hitid = self.genID()
 			turkid = self.genID()
+			assid = self.genID()
 			provisional = True
 		if (models.PUser.objects.filter(pk=turkid).exists()):
 			user = models.PUser.objects.get(pk=turkid)
 		else:
-			user = self.initialize_new_user(turkid, hitid, provisional)
+			user = self.initialize_new_user(turkid, hitid, assid, provisional)
 		if user is None:
 			new_context = dict()
 			new_context['user'] = None
@@ -88,7 +109,7 @@ class IntroView(TemplateView):
 		context['hitid'] = user.hit_id
 		context['turkid'] = user.turk_id
 		return context
-	def initialize_new_user(self, turkid, hitid, provisional):
+	def initialize_new_user(self, turkid, hitid, assid,  provisional):
 		#retrieve a taskset that doesn't have a user yet
 		#first, get all the ones that do?
 		users = models.PUser.objects.all()
@@ -99,10 +120,36 @@ class IntroView(TemplateView):
 			index = 0
 		else:
 			index = random.randint(0, len(remaining)-1)
-		new_user = models.PUser(turk_id = turkid, hit_id = hitid, provisional = provisional, git_revision = git_describe(), taskset = remaining.all()[index])
+		new_user = models.PUser(turk_id = turkid, hit_id = hitid, provisional = provisional, assignment_id = assid, git_revision = git_describe(), taskset = remaining.all()[index])
 		new_user.save()
 		return new_user 
 		
+
+class ValidationView(TemplateView):
+	template_name = 'validation.html'
+	def get_context_data(self, **kwargs):
+		context = super(ValidationView, self).get_context_data(**kwargs)
+		context['allPayouts'] = models.Payout.objects.all()
+		paidUsers = models.PUser.objects.filter(pk__in=[payout.turk_id for payout in context['allPayouts']])
+		curUsers = paidUsers.filter(git_revision = git_describe())
+		for user in paidUsers:
+			complete = models.Result.objects.filter(selector=user)
+			numCorrect = complete.filter(correct = 1).count()
+			numIncorrect = complete.filter(correct = 2).count()
+			numTimeout = complete.filter(correct = 0).count()
+			pCorrect = Decimal(numCorrect) / Decimal(numCorrect + numIncorrect + numTimeout)
+			pTimeout = Decimal(numTimeout) / Decimal(numCorrect + numIncorrect + numTimeout)
+			numTop = complete.filter(choice="TOP").count()
+			numBottom = complete.filter(choice="BOT").count()
+			pTop = Decimal(numTop) / Decimal(numTop + numBottom)
+			pBot = Decimal(numBottom) / Decimal(numTop + numBottom)
+			if (models.Validation.objects.filter(turk_id = user.pk).exists()):
+				models.Validation.objects.filter(pk = user.pk).update(percentCorrect = pCorrect, percentTop = pTop, percentBottom = pBot, percentTimeout = pTimeout)
+			else:
+				models.Validation.objects.create(turk_id = user.pk, percentCorrect = pCorrect, percentTop = pTop, percentBottom = pBot, percentTimeout = pTimeout)
+		context['allValidations'] = models.Validation.objects.filter(pk__in=[payout.turk_id for payout in context['allPayouts']])
+		#we want to know each user who is paid, their bonus, the percent they clicked top, the percent they clicked bottom, their number of timeouts, and their percent correct
+		return context		
 
 class ResultsView(TemplateView):
 	template_name = 'result.html'
@@ -125,6 +172,24 @@ class ResultsView(TemplateView):
 		context['csv'] = csv
 		return context
 
+class BreakView(TemplateView):
+	template_name = 'break.html'
+	def dispatch(self, *args, **kwargs):
+		if ('turk_id' not in self.request.session or 'task' not in self.request.session):
+			return HttpResponseRedirect(reverse_lazy('intro'))
+		user = models.PUser.objects.get(pk = self.request.session['turk_id'])
+		if not user.breakTime:
+			return HttpResponseRedirect(reverse_lazy('task'))
+		else:
+			user.breakTime = None
+			user.save()
+		return super(BreakView, self).dispatch(*args, **kwargs)
+	def get_context_data(self, **kwargs):
+		context = super(BreakView, self).get_context_data(**kwargs)
+		context['return_url'] = reverse_lazy('task')
+		return context
+
+
 class TaskView(TemplateView):
 	template_name = 'task.html'
 	def dispatch(self, *args, **kwargs):
@@ -132,6 +197,13 @@ class TaskView(TemplateView):
 			return HttpResponseRedirect(reverse_lazy('intro'))
 		if self.getNumTasks() == 0 or models.PUser.objects.get(pk=self.request.session['turk_id']).dead is True:
 			return HttpResponseRedirect(reverse_lazy('end'))
+		elif self.getNumTasks() == 136 and models.PUser.objects.get(pk=self.request.session['turk_id']).breakTime is False:
+			if 'stime' in self.request.session:
+				self.request.session.pop('stime', None)
+			user = models.PUser.objects.get(pk=self.request.session['turk_id']) 
+			user.breakTime = True
+			user.save()
+			return HttpResponseRedirect(reverse_lazy('break'))
 		if ('stime' not in self.request.session):
 			self.request.session['stime'] = time.time()
 		return super(TaskView, self).dispatch(*args, **kwargs)
@@ -161,6 +233,7 @@ class TaskView(TemplateView):
 			randomIndex = random.randint(0, incompleteTasks.count() - 1)
 		self.request.session['task'] = model_to_dict(incompleteTasks[randomIndex])
 		self.request.session['stime'] = time.time()
+		kwargs = dict()
 		kwargs['numTasks'] = numTasks
 		return render(request, self.template_name, self.get_context_data(**kwargs))
 	def getIncomplete(self):
@@ -201,6 +274,7 @@ class InitImagesView(TemplateView):
 				image_obj = models.Image(group = image_group, image = settings.MEDIA_URL +"/"+sym_folder+"/"+ image) 
 				image_obj.save()
 
+
 class InitTasksView(TemplateView):
 	template_name= 'init2.html'
 #ok, images initialized. presumably. Now we need to collect the images into tasks.
@@ -239,7 +313,7 @@ class InitTaskSetView(TemplateView):
 	template_name = 'init3.html'
 	def dispatch(self, *args, **kwargs):
 		self.initTaskSets()
-		kwargs['numsets'] = len(models.TaskSet.objects.all())
+		kwargs['numsets'] = len(models.TaskSet.objects.filter(puser=None))
 		kwargs['redir_url'] = reverse_lazy('intro')
 		#if kwargs['numsets'] > 1000:
 		#	return HttpResponseRedirect(reverse_lazy('intro'))

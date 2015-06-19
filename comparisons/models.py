@@ -72,11 +72,26 @@ class TaskSet(models.Model):
 		results = Result.objects.filter(selector__turk_id = user.turk_id)
 		return self.tasks.exclude(id__in=[result.task.id for result in results])
 
+
+class Payout(models.Model):
+	turk_id = models.CharField(primary_key=True, max_length=40)
+	pay = models.PositiveIntegerField() 
+	bonus = models.PositiveIntegerField()
+
+class Validation(models.Model):
+	turk_id = models.CharField(primary_key=True, max_length=40)
+	percentCorrect = models.DecimalField(max_digits = 3, decimal_places = 3)
+	percentTop = models.DecimalField(max_digits = 3, decimal_places = 3)
+	percentBottom = models.DecimalField(max_digits = 3, decimal_places = 3)
+	percentTimeout = models.DecimalField(max_digits = 3, decimal_places = 3)	
+
 class PUser(models.Model):
-	turk_id = models.PositiveIntegerField(primary_key=True)
+	breakTime = models.NullBooleanField(default=False)
+	turk_id = models.CharField(primary_key=True, max_length=40)
 	taskset = models.OneToOneField(TaskSet)
 	dead = models.BooleanField(default=False)
-	hit_id = models.PositiveIntegerField(default=1) #the "HIT" this user participated in
+	hit_id = models.CharField(default=1, max_length=40) #the "HIT" this user participated in
+	assignment_id = models.CharField(default=1, max_length=40) #hits are the whole assignment, assignments are an individual user's slice of the cake, unique given hit_id and turk_id
 	date = models.DateTimeField(auto_now_add=True)
 	git_revision = models.CharField(max_length=30) #populated automatically with bash looking at the git revision num
 	provisional = models.BooleanField(default=True) #hit_id and turk_id are randomly generated
@@ -87,15 +102,20 @@ class Result(models.Model):
 	CHOICES = ( ("TOP", "choice1"), ("BOT", "choice2") )
 	choice = models.CharField(max_length=3, choices=CHOICES)
 	CORRECTNESS = ( (1, "correct"), (0, "timeout"), (2, "incorrect") )
-	correct = models.SmallIntegerField(default=0, choices=CORRECTNESS)
+	TECH_CORRECTNESS = ( ( 1, "correct"), (2, "incorrect") )
+	correct = models.SmallIntegerField(default = 0, choices=CORRECTNESS)
+	tech_correct = models.SmallIntegerField(default = 0, choices=TECH_CORRECTNESS)
 	elapsedTime = models.PositiveIntegerField(default=3)
 	def setCorrect(self):
-		if (self.elapsedTime > 5):
-			self.correct = 0
-		elif (self.choice == self.CHOICES[0][0] and self.task.choice1.group == self.task.test_image.group):
+		if (self.choice == self.CHOICES[0][0] and self.task.choice1.group == self.task.test_image.group):
 			self.correct = 1
+			self.tech_correct = 1
 		elif (self.choice == self.CHOICES[1][0] and self.task.choice2.group == self.task.test_image.group):
 			self.correct = 1
+			self.tech_correct = 1
 		else:
 			self.correct = 2
+			self.tech_correct = 2
+		if (self.elapsedTime > 5):
+			self.correct = 0
 		self.save()
