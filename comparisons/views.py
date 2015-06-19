@@ -55,7 +55,8 @@ class EndView(TemplateView):
 	def getBonus(self, user):
 		complete = models.Result.objects.filter(selector=user)
 		correct = complete.filter(correct=1).count()
-		return max(0.0, round(4.0 * (0.5 - (correct / (correct + complete.filter(correct=0).count() + complete.filter(correct=2).count()))), 2))
+		pCor = correct / (correct + complete.filter(correct=0).count() + complete.filter(correct=2).count())
+		return max(0.0, round(4.0 * (pCor - 0.5), 2))
 
 
 class IntroView(TemplateView):
@@ -216,11 +217,13 @@ class TaskView(TemplateView):
 	def post(self, request):
 		newTime = time.time()
 		ttime = round(newTime - request.session['stime'])
-		if request.POST.get("top.x"):
-			result = models.Result(selector=models.PUser.objects.get(pk=request.session['turk_id']), task=self.dicToTask(self.request.session['task']), choice=models.Result.CHOICES[0][0], elapsedTime=ttime)
+		user = models.PUser.objects.get(pk = request.session['turk_id'])
+		thisTask = self.dicToTask(self.request.session['task'])
+		if request.POST.get("top.x") and not self.taskDone(user, thisTask):
+			result = models.Result(selector=user, task=thisTask, choice=models.Result.CHOICES[0][0], elapsedTime=ttime)
 			result.setCorrect()
-		elif request.POST.get("bottom.x"):
-			result = models.Result(selector=models.PUser.objects.get(pk=request.session['turk_id']), task=self.dicToTask(self.request.session['task']), choice=models.Result.CHOICES[1][0], elapsedTime=ttime)
+		elif request.POST.get("bottom.x") and not self.taskDone(user, thisTask):
+			result = models.Result(selector=user, task=thisTask, choice=models.Result.CHOICES[1][0], elapsedTime=ttime)
 			result.setCorrect()
 		incompleteTasks = self.getIncomplete()
 		numTasks = incompleteTasks.count()
@@ -236,6 +239,8 @@ class TaskView(TemplateView):
 		kwargs = dict()
 		kwargs['numTasks'] = numTasks
 		return render(request, self.template_name, self.get_context_data(**kwargs))
+	def taskDone(self, user, thisTask):
+		return models.Result.objects.filter(selector=user, task=thisTask).exists()
 	def getIncomplete(self):
 		return models.PUser.objects.get(pk=self.request.session['turk_id']).taskset.getIncompleteTasks().all()
 	def getNumTasks(self):
