@@ -1,4 +1,5 @@
-import subprocess
+import subprocess, collections, os, random
+from symper import settings
 
 def _check_output(list_of_args):
 	#if 'stdout' in kwargs:
@@ -16,3 +17,4 @@ def _check_output(list_of_args):
 def git_describe():
 	return _check_output(["git", "--work-tree=/home/jrc436/symper", "--git-dir=/home/jrc436/symper/.git", "describe"])
 	#return "v0.1"
+

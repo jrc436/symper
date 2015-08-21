@@ -4,14 +4,15 @@ from django.http import HttpResponseRedirect
 from comparisons import models
 import os, random, time, subprocess, decimal
 from symper import settings
+from util import git_describe
 from django.views.generic import TemplateView, DetailView
 from django.views.generic.list import ListView
 from django.forms.models import model_to_dict
-from util import git_describe
 from itertools import chain
 from boto.mturk import connection
 from boto.mturk.price import Price
 from decimal import Decimal
+from django.db.models import Count, Max
 
 class EndView(TemplateView):
 	template_name = 'end.html'
@@ -55,7 +56,7 @@ class EndView(TemplateView):
 	def getBonus(self, user):
 		complete = models.Result.objects.filter(selector=user)
 		correct = complete.filter(correct=1).count()
-		pCor = correct / (correct + complete.filter(correct=0).count() + complete.filter(correct=2).count())
+		pCor = float(correct) / float(correct + complete.filter(correct=0).count() + complete.filter(correct=2).count())
 		return max(0.0, round(4.0 * (pCor - 0.5), 2))
 
 
@@ -84,7 +85,7 @@ class IntroView(TemplateView):
 		if user is None:
 			new_context = dict()
 			new_context['user'] = None
-			new_context['redir_url'] = reverse_lazy('init3')
+			#new_context['redir_url'] = reverse_lazy('init3')
 			return render(request, self.template_name, new_context) 
 		tasks = user.taskset.getIncompleteTasks()
 		numTasks = tasks.count()
@@ -130,10 +131,15 @@ class ValidationView(TemplateView):
 	template_name = 'validation.html'
 	def get_context_data(self, **kwargs):
 		context = super(ValidationView, self).get_context_data(**kwargs)
-		context['allPayouts'] = models.Payout.objects.all()
-		paidUsers = models.PUser.objects.filter(pk__in=[payout.turk_id for payout in context['allPayouts']])
-		curUsers = paidUsers.filter(git_revision = git_describe())
-		for user in paidUsers:
+		paidUsers = models.PUser.objects.exclude(provisional=True)
+		#newestUser = paidUsers.latest('date')#get(date=paidUsers.aggregate(newest=Max("date"))['newest'])
+		#curUsers = paidUsers.filter(hit_id = newestUser.hit_id)
+		finishedUsers = paidUsers.filter(dead=True)
+		#newestUser = finishedUsers.latest('date')
+		#curUsers = finishedUsers.filter(hit_id = newestUser.hit_id) 
+		curUsers = finishedUsers
+		userinfo = []
+		for user in curUsers:
 			complete = models.Result.objects.filter(selector=user)
 			numCorrect = complete.filter(correct = 1).count()
 			numIncorrect = complete.filter(correct = 2).count()
@@ -148,7 +154,11 @@ class ValidationView(TemplateView):
 				models.Validation.objects.filter(pk = user.pk).update(percentCorrect = pCorrect, percentTop = pTop, percentBottom = pBot, percentTimeout = pTimeout)
 			else:
 				models.Validation.objects.create(turk_id = user.pk, percentCorrect = pCorrect, percentTop = pTop, percentBottom = pBot, percentTimeout = pTimeout)
-		context['allValidations'] = models.Validation.objects.filter(pk__in=[payout.turk_id for payout in context['allPayouts']])
+			pay = models.Payout.objects.get(pk=user.pk)
+			pennies = pay.pay + pay.bonus
+			this_user = (user.pk, complete.count(), user.hit_id, models.Validation.objects.get(pk=user.pk), pennies)
+			userinfo.append(this_user)
+		context['userinfo'] = userinfo
 		#we want to know each user who is paid, their bonus, the percent they clicked top, the percent they clicked bottom, their number of timeouts, and their percent correct
 		return context		
 
@@ -156,20 +166,64 @@ class ResultsView(TemplateView):
 	template_name = 'result.html'
 	def get_context_data(self, **kwargs):
 		context = super(ResultsView, self).get_context_data(**kwargs)
-		context['numParticipants'] = models.PUser.objects.all().count()
 		#there are, effectively, 272 types of results.... so let's just progrma this shite
+		filteredUsers = self.getFilteredUsers()
+		#context['hitid'] = list(filteredUsers[:1])[0].hit_id
+		context['numParticipants'] = filteredUsers.count()
 		csv = []
 		csv.append("target,comparison,accuracy")
+		relResults = models.Result.objects.filter(selector__in=[user for user in filteredUsers])
 		for t in range(0,len(models.Image.GROUPS)):
 			for c in range(t+1,len(models.Image.GROUPS)):
-				qset0 = models.Result.objects.filter(task__test_image__group = models.Image.GROUPS[t][0])
-				qset0r = models.Result.objects.filter(task__choice1__group = models.Image.GROUPS[t][0]) |  models.Result.objects.filter(task__choice2__group = models.Image.GROUPS[t][0])
+				qset0 = relResults.filter(task__test_image__group = models.Image.GROUPS[t][0])
+				qset0r = relResults.filter(task__choice1__group = models.Image.GROUPS[t][0]) | relResults.filter(task__choice2__group = models.Image.GROUPS[t][0])
 				qset1 = qset0.filter(task__choice1__group = models.Image.GROUPS[c][0]) |  qset0.filter(task__choice2__group = models.Image.GROUPS[c][0])
 				qset1r = qset0r.filter(task__test_image__group = models.Image.GROUPS[c][0])
 				numCorrect = qset1.filter(correct = 1).count() + qset1r.filter(correct = 1).count()
 				totalNum = qset1.all().count() + qset1r.all().count()
 				accuracy = float(numCorrect) / float(totalNum) 
 				csv.append(models.Image.GROUPS[t][0] + "," + models.Image.GROUPS[c][0] +"," + "%2.3f" % accuracy)
+		context['csv'] = csv
+		return context
+	def getFilteredUsers(self):
+		paidUsers = models.PUser.objects.filter(provisional=False)
+		clicked_corrects = paidUsers.annotate(Count('result')).exclude(result__count__lt=272).exclude(result__count__gte=340)
+		validations = models.Validation.objects.filter(pk__in=[user.pk for user in clicked_corrects])
+		unrandom_vals = validations.exclude(percentTop__gte=Decimal("0.6")).exclude(percentBottom__gte=Decimal("0.6"))
+		timedout_vals = unrandom_vals.exclude(percentTimeout__gte=Decimal("0.2"))
+		return clicked_corrects.filter(pk__in=[v.pk for v in timedout_vals])
+
+
+class FDResultsView(ResultsView):
+	template_name = "result.html"
+	def get_context_data(self, **kwargs):
+		context = super(FDResultsView, self).get_context_data(**kwargs)
+		filteredUsers = self.getFilteredUsers()
+		csv = []
+		csv.append('group_target,group_comp,rot_same,ref_same,gref_same,tile_same,user_id,task_id,distance,accuracy')
+		relResults = models.Result.objects.filter(selector__in=[user for user in filteredUsers])
+		#graph = init_sym_graph()
+		#dji_struct = all_dijsktra(graph) 
+		for result in relResults:
+			target_group = result.task.test_image
+			comp_group = result.task.choice2 if result.task.test_image.group == result.task.choice1.group else result.task.choice1
+			rot_target = target_group.rotation_group()
+			rot_comp = comp_group.rotation_group()
+			ref_target = target_group.has_reflection()
+			ref_comp = comp_group.has_reflection()
+			gref_target = target_group.has_glide()
+			gref_comp = comp_group.has_glide()
+			tile_target = target_group.tile()
+			tile_comp = comp_group.tile()
+			user_id = result.selector.pk
+			task_id = result.task.id
+			distance = target_group.distance(comp_group)
+			rot_same = rot_target == rot_comp
+			ref_same = ref_target == ref_comp
+			gref_same = gref_target == gref_comp
+			tile_same = tile_target == tile_comp
+			correct = 1 if result.correct == 1 else 0  
+			csv.append(target_group.group+","+comp_group.group+","+str(rot_same)+","+str(ref_same)+","+str(gref_same)+","+str(tile_same)+","+user_id+","+str(task_id)+","+str(distance)+","+str(correct))
 		context['csv'] = csv
 		return context
 
@@ -219,10 +273,10 @@ class TaskView(TemplateView):
 		ttime = round(newTime - request.session['stime'])
 		user = models.PUser.objects.get(pk = request.session['turk_id'])
 		thisTask = self.dicToTask(self.request.session['task'])
-		if request.POST.get("top.x") and not self.taskDone(user, thisTask):
+		if request.POST.get("top.x"): #and not self.taskDone(user, thisTask):
 			result = models.Result(selector=user, task=thisTask, choice=models.Result.CHOICES[0][0], elapsedTime=ttime)
 			result.setCorrect()
-		elif request.POST.get("bottom.x") and not self.taskDone(user, thisTask):
+		elif request.POST.get("bottom.x"):# and not self.taskDone(user, thisTask):
 			result = models.Result(selector=user, task=thisTask, choice=models.Result.CHOICES[1][0], elapsedTime=ttime)
 			result.setCorrect()
 		incompleteTasks = self.getIncomplete()
@@ -251,91 +305,18 @@ class TaskView(TemplateView):
 		return models.Task.objects.get(choice1__id=taskjson['choice1'], choice2__id=taskjson['choice2'], test_image__id=taskjson['test_image'])
 	
 
-class InitImagesView(TemplateView):
+class InitView(TemplateView):
 	#first, need to initialize the images. Next, need to initialize the tasks.
 	#the images is just a simple matter of performing manual insertions 	
 	template_name = 'init.html'
 	def get_context_data(self, **kwargs):
 		#print("we are calling a thing")
-		self.initImages()
-		context = super(InitImagesView, self).get_context_data(**kwargs)
-		context['expected'] = 85
-		context['actual'] = len(models.Image.objects.all())
+		context = super(InitView, self).get_context_data(**kwargs)
+		context['expected_images'] = 85
+		context['actual_images'] = models.Image.objects.all().count()
+		context['expected_tasks'] = 54400 #17 * 100 * 16 * 99 * 100 * 2
+		context['actual_tasks'] = models.Task.objects.all().count()
+		context['expected_distances'] = 289
+		context['actual_distances'] = models.Distance.objects.all().count()
+		context['numsets'] = models.TaskSet.objects.filter(puser=None).count()
 		return context
-	def initImages(self):
-		baseDir = settings.MEDIA_ROOT
-		#print(baseDir)
-		sym_folder = "sym_images"
-		for dirName, subdirList, fileList in os.walk(baseDir):
-			print("At directory: %s" % dirName)
-			if (sym_folder not in dirName):
-				continue
-	 		for image in fileList:
-				print("Currently viewing Image: %s" % image)
-				#do some regex magic to extract the wallpaper group
-				image_group = image.split('_')[0]
-				print("Image is of group: %s" % image_group)
-				#path to the image on the server
-				image_obj = models.Image(group = image_group, image = settings.MEDIA_URL +"/"+sym_folder+"/"+ image) 
-				image_obj.save()
-
-
-class InitTasksView(TemplateView):
-	template_name= 'init2.html'
-#ok, images initialized. presumably. Now we need to collect the images into tasks.
-	#we want 16 tasks for each of the 17 images.
-	
-	def get_context_data(self, **kwargs):
-		self.initGroups()
-		context = super(InitTasksView, self).get_context_data(**kwargs)
-		context['expected'] = 54400 #17 * 5 * 16 * 4 * 5 * 2
-		context['actual'] = len(models.Task.objects.all())
-		return context
-
-	def initGroups(self):
-		for group in models.Image.GROUPS:
-			#Now we need to create 16*n tasks, to start.
-			#print(group[0])
-			sett = list(models.Image.objects.filter(group = group[0]))
-			#print(len(sett))
-			for imag in sett:
-				for other_group in models.Image.GROUPS:
-					if (group == other_group):
-						continue
-					otherSett = list(models.Image.objects.filter(group = other_group[0]))
-						#every other image in the group
-					for other_imag in sett:
-						if other_imag == imag:
-							continue
-							#every image in the other group
-						for third_imag in otherSett:
-							task_obj = models.Task(test_image = imag, choice1 = third_imag, choice2 = other_imag)
-							task_obj.save()
-							task_obj2 = models.Task(test_image = imag, choice1 = other_imag, choice2 = third_imag)
-							task_obj2.save()
-	
-class InitTaskSetView(TemplateView):
-	template_name = 'init3.html'
-	def dispatch(self, *args, **kwargs):
-		self.initTaskSets()
-		kwargs['numsets'] = len(models.TaskSet.objects.filter(puser=None))
-		kwargs['redir_url'] = reverse_lazy('intro')
-		#if kwargs['numsets'] > 1000:
-		#	return HttpResponseRedirect(reverse_lazy('intro'))
-		return render(self.request, self.template_name, self.get_context_data(**kwargs))
-	def initTaskSets(self):	#initialize tasksets
-		#print(i)
-		taskset = models.TaskSet()
-		taskset.save()
-		for group in models.Image.GROUPS:
-			#grab all of the tasks where the test image is group
-			qset = models.Task.objects.filter(test_image__group = group[0])
-			for other_group in models.Image.GROUPS:
-				if (group == other_group):
-					continue
-				#this queryset is looking to see if either of the choices match "other_group"
-				queryset = qset.filter(choice1__group = other_group[0]) | qset.filter(choice2__group = other_group[0])
-				choose = random.randint(0, len(queryset)-1)
-				taskset.tasks.add(queryset[choose])
-				taskset.save()
-

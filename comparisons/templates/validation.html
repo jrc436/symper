@@ -1,8 +1,6 @@
-<p>{% for payout in allPayouts %}
-	{{ payout.turk_id }},{{ payout.pay }}, {{ payout.bonus }}<br>
-{% endfor %}</p>
-<p> {{ completenum }} </p>
-<p>{% for validation in allValidations %}
-	{{ validation.turk_id }}, {{ validation.percentCorrect }}, {{ validation.percentTop }}, {{ validation.percentBottom }}, {{ validation.percentTimeout }}<br>
+<p>
+turk_id, hit_id, num_clicks, per_Correct, per_top, per_bottom, per_timeout, pennies_paid<br>
+{% for info in userinfo %}
+	{{ info.0 }}, {{ info.2 }}, {{ info.1 }}, {{ info.3.percentCorrect }}, {{ info.3.percentTop }}, {{ info.3.percentBottom }}, {{ info.3.percentTimeout }}, {{ info.4 }}<br>
 {% endfor %}</p>
 	

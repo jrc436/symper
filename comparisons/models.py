@@ -1,5 +1,8 @@
 from django.db import models
 from datetime import datetime
+#from util import Graph
+#from util import dijsktra
+#from util import all_dijsktra
 
 class Image(models.Model):
 	image = models.ImageField(upload_to = "sym_images")
@@ -23,30 +26,32 @@ class Image(models.Model):
 	GROUPS = ( (P6M, P6M), (P6, P6), (P31M, P31M), (P3M1, P3M1), (P3, P3), (P4G, P4G), (P4M, P4M), (P4, P4), (CMM, CMM), (PGG, PGG), (PMG, PMG), (PMM, PMM), (CM, CM), (PG, PG), (PM, PM), (P2, P2), (P1, P1) )
 	group = models.CharField(max_length=4, choices=GROUPS)
 	def rotation_group(self):
-		if self.group == P1 or self.group == PM or self.group == CM or self.group == PG:
+		if self.group.lower() == Image.P1 or self.group.lower() == Image.PM or self.group.lower() == Image.CM or self.group.lower() == Image.PG:
 			return 1
-		elif self.group == P2 or self.group == PMM or self.group == PMG or self.group == PGG or self.group == CMM:
+		elif self.group.lower() == Image.P2 or self.group.lower() == Image.PMM or self.group.lower() == Image.PMG or self.group.lower() == Image.PGG or self.group.lower() == Image.CMM:
 			return 2
-		elif self.group == P4 or self.group == P4M or self.group == P4G:
+		elif self.group.lower() == Image.P4 or self.group.lower() == Image.P4M or self.group.lower() == Image.P4G:
 			return 4
-		elif self.group == P3 or self.group == P31M or self.group == P3M1:
+		elif self.group.lower() == Image.P3 or self.group.lower() == Image.P31M or self.group.lower() == Image.P3M1:
 			return 3
-		elif self.group == P6 or self.group == P6M:
+		elif self.group.lower() == Image.P6 or self.group.lower() == Image.P6M:
 			return 6
+		else:
+			return "NOPE"
 	def has_reflection(self):
-		if self.group == P1 or self.group == P2 or self.group == PG or self.group == PGG or self.group == P4 or self.group == P3 or self.group == P6:
+		if self.group.lower() == Image.P1 or self.group.lower() == Image.P2 or self.group.lower() == Image.PG or self.group.lower() == Image.PGG or self.group.lower() == Image.P4 or self.group.lower() == Image.P3 or self.group.lower() == Image.P6:
 			return False
 		else:
 			return True
 	def has_glide(self):
-		if self.group == P1 or self.group == P2 or self.group == PM or self.group == PMM or self.group == P4 or self.group == P3 or self.group == P6: 
+		if self.group.lower() == Image.P1 or self.group.lower() == Image.P2 or self.group.lower() == Image.PM or self.group.lower() == Image.PMM or self.group.lower() == Image.P4 or self.group.lower() == Image.P3 or self.group.lower() == Image.P6: 
 			return False
 		else:
 			return True
 	def has_rotation_group(self, order):
 		if order != 1 and order != 2 and order != 3 and order != 4 and order != 6:
 			raise "Invalid rotation order"
-		gr = self.rotation_group
+		gr = self.rotation_group()
 		if order == 1 and gr == 1:
 			return True
 		elif order == 2 and (gr == 2 or gr == 4 or gr == 6):
@@ -59,11 +64,33 @@ class Image(models.Model):
 			return True
 		else:
 			return False
+	def tile(self):
+		if self.group.lower() == Image.P1 or self.group.lower() == Image.P2:
+			return "oblique"
+		elif self.group.lower() == Image.PM or self.group.lower() == Image.PG or self.group.lower() == Image.PMM or self.group.lower() == Image.PMG or self.group.lower() == Image.PGG:
+			return "rectangular"
+		elif self.group.lower() == Image.CM or self.group.lower() == Image.CMM:
+			return "rhombic"
+		elif self.group.lower() == Image.P4 or self.group.lower() == Image.P4M or self.group.lower() == Image.P4G:
+			return "square"
+		else:
+			return "hexagonal"
+
+	def distance(self, other):
+		distance = Distance.objects.filter(from_group = self.group).filter(to_group = other.group).get()
+		return distance.distance
+
+
 
 class Task(models.Model):
         test_image = models.ForeignKey(Image, related_name='testset')
         choice1 = models.ForeignKey(Image, related_name='oneset')
         choice2 = models.ForeignKey(Image, related_name='twoset')
+
+class Distance(models.Model):
+	from_group = models.CharField(max_length=4, choices=Image.GROUPS)
+	to_group = models.CharField(max_length=4, choices=Image.GROUPS)	
+	distance = models.PositiveIntegerField()
 
 class TaskSet(models.Model):
 	tasks = models.ManyToManyField(Task)
@@ -77,6 +104,10 @@ class Payout(models.Model):
 	turk_id = models.CharField(primary_key=True, max_length=40)
 	pay = models.PositiveIntegerField() 
 	bonus = models.PositiveIntegerField()
+	
+class Paid(models.Model):
+	turk_id = models.CharField(primary_key=True, max_length=40)
+	pay_date = models.DateTimeField()
 
 class Validation(models.Model):
 	turk_id = models.CharField(primary_key=True, max_length=40)

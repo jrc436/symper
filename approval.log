@@ -1,0 +1,93 @@
+>>> approve_by_date("2015-08-18")
+Approving worker A2TACC8H6KB8R7
+exception when approving:
+MTurkRequestError: 200 OK
+<?xml version="1.0"?>
+<ApproveAssignmentResponse><OperationRequest><RequestId>7c510475-3e86-42cc-b436-d50a0f5996a5</RequestId></OperationRequest><ApproveAssignmentResult><Request><IsValid>False</IsValid><Errors><Error><Code>AWS.MechanicalTurk.InvalidAssignmentState</Code><Message>This operation can be called with a status of: Submitted (1440000632683)</Message><Data><Key>ExpectedStates</Key><Value>Submitted</Value></Data><Data><Key>CurrentState</Key><Value>Rejected</Value></Data><Data><Key>ExpectedStates</Key><Value>Submitted</Value></Data></Error></Errors></Request></ApproveAssignmentResult></ApproveAssignmentResponse>
+  Bonus 1.23
+Approving worker AEXYBW3COL9JM
+  Bonus 1.44
+Approving worker A16CLW141KFQE4
+  Bonus 1.34
+Approving worker A39QOA9M7GNF86
+  Bonus 1.06
+Approving worker A173LV77LF3SHB
+  Bonus 0.9
+Approving worker A5EU1AQJNC7F2
+  Bonus 1.12
+Approving worker A2NA2OJT15COZY
+  Bonus 1.24
+Approving worker A3NG6M8UG9U20J
+  Bonus 1.27
+Approving worker AMERD84D2MGKR
+  Bonus 1.31
+Approving worker A2O5OJXCUFQ3FV
+  Bonus 0.0
+exception when bonusing:
+MTurkRequestError: 200 OK
+<?xml version="1.0"?>
+<GrantBonusResponse><OperationRequest><RequestId>2c34d15e-3928-4b30-9061-a8df899b1dba</RequestId></OperationRequest><GrantBonusResult><Request><IsValid>False</IsValid><Errors><Error><Code>AWS.ParameterOutOfRange</Code><Message>The value 0.00 is invalid for BonusAmount.Amount. Valid values range from 0.01 to 2147483. (1440000636385)</Message><Data><Key>MaximumValue</Key><Value>2147483</Value></Data><Data><Key>MinimumValue</Key><Value>0.01</Value></Data><Data><Key>Parameter</Key><Value>BonusAmount.Amount</Value></Data><Data><Key>Value</Key><Value>0.00</Value></Data><Data><Key>MaximumValue</Key><Value>2147483</Value></Data><Data><Key>MinimumValue</Key><Value>0.01</Value></Data><Data><Key>Parameter</Key><Value>BonusAmount.Amount</Value></Data><Data><Key>Value</Key><Value>0.00</Value></Data></Error></Errors></Request></GrantBonusResult></GrantBonusResponse>
+Approving worker A1OXHIJ79K3D2E
+  Bonus 0.97
+Approving worker AQ8RTCQRFGW8X
+exception when approving:
+MTurkRequestError: 200 OK
+<?xml version="1.0"?>
+<ApproveAssignmentResponse><OperationRequest><RequestId>61891741-213b-49f2-8c5a-5db971514628</RequestId></OperationRequest><ApproveAssignmentResult><Request><IsValid>False</IsValid><Errors><Error><Code>AWS.MechanicalTurk.AssignmentDoesNotExist</Code><Message>Assignment 3TXWC2NHNZQXWAFDBGPGTNJO7R8S9I does not exist. (1440000636841)</Message><Data><Key>AssignmentId</Key><Value>3TXWC2NHNZQXWAFDBGPGTNJO7R8S9I</Value></Data></Error></Errors></Request></ApproveAssignmentResult></ApproveAssignmentResponse>
+  Bonus 1.29
+exception when bonusing:
+MTurkRequestError: 200 OK
+<?xml version="1.0"?>
+<GrantBonusResponse><OperationRequest><RequestId>e19abd2c-2b4a-481d-b730-617f999fc7cf</RequestId></OperationRequest><GrantBonusResult><Request><IsValid>False</IsValid><Errors><Error><Code>AWS.MechanicalTurk.AssignmentDoesNotExist</Code><Message>Assignment 3TXWC2NHNZQXWAFDBGPGTNJO7R8S9I does not exist. (1440000636986)</Message><Data><Key>AssignmentId</Key><Value>3TXWC2NHNZQXWAFDBGPGTNJO7R8S9I</Value></Data></Error></Errors></Request></GrantBonusResult></GrantBonusResponse>
+Approving worker A2K9BO7DWZLNMA
+  Bonus 1.28
+Approving worker A3V70AZ39FPZ5V
+  Bonus 1.18
+Approving worker AUAN582MLI96N
+  Bonus 0.68
+Approving worker A2K34PD27VKGYG
+  Bonus 0.91
+Approving worker A22ZVWOXT5JNNU
+  Bonus 0.96
+Approving worker AK37IEOYWN5YH
+  Bonus 1.43
+Approving worker A3885G6NQ9V27J
+  Bonus 1.21
+Approving worker A2QEX61YIEGLL3
+  Bonus 0.15
+Approving worker A3AE627X3R2JQI
+  Bonus 1.44
+Approving worker A2H90BPVE5L51U
+  Bonus 0.19
+Approving worker A2J5DN5UMU0A3Z
+  Bonus 1.14
+Approving worker A3P74FP62XNVYI
+  Bonus 1.07
+Approving worker A3H4S6H2P2GO8Z
+  Bonus 1.0
+Approving worker A2AOBW5F65D5D
+  Bonus 1.32
+Approving worker AAJEPFSQNC6X
+  Bonus 1.34
+Approving worker AL4C7GC8RJJDD
+exception when approving:
+MTurkRequestError: 200 OK
+<?xml version="1.0"?>
+<ApproveAssignmentResponse><OperationRequest><RequestId>d12dfb64-22b1-4493-9a0a-d00f4902c4d5</RequestId></OperationRequest><ApproveAssignmentResult><Request><IsValid>False</IsValid><Errors><Error><Code>AWS.MechanicalTurk.AssignmentDoesNotExist</Code><Message>Assignment 3L6L49WXW0XVT2BQIPGHJ4YG7FR542 does not exist. (1440000643074)</Message><Data><Key>AssignmentId</Key><Value>3L6L49WXW0XVT2BQIPGHJ4YG7FR542</Value></Data></Error></Errors></Request></ApproveAssignmentResult></ApproveAssignmentResponse>
+  Bonus 1.04
+exception when bonusing:
+MTurkRequestError: 200 OK
+<?xml version="1.0"?>
+<GrantBonusResponse><OperationRequest><RequestId>098e8b55-2518-43fc-8f2c-1349ec2318de</RequestId></OperationRequest><GrantBonusResult><Request><IsValid>False</IsValid><Errors><Error><Code>AWS.MechanicalTurk.InvalidParameterValue</Code><Message>The value "AL4C7GC8RJJDD" is not valid for the parameter WorkerId. (1440000643230)</Message><Data><Key>Parameter</Key><Value>WorkerId</Value></Data><Data><Key>Value</Key><Value>AL4C7GC8RJJDD</Value></Data><Data><Key>Parameter</Key><Value>WorkerId</Value></Data><Data><Key>Value</Key><Value>AL4C7GC8RJJDD</Value></Data></Error></Errors></Request></GrantBonusResult></GrantBonusResponse>
+Approving worker A335F237PMK2AN
+  Bonus 1.27
+Approving worker A1THCV9EM7E9P5
+  Bonus 0.43
+Approving worker A1N35VV9QURKHX
+  Bonus 0.83
+Approving worker A1VLZL3CA1WMPT
+  Bonus 1.21
+Approving worker A3JI3B5GTVA95F
+  Bonus 1.07
+33 workers approved.
+Total bonus: $34.32
