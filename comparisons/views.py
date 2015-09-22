@@ -194,6 +194,48 @@ class ResultsView(TemplateView):
 		return clicked_corrects.filter(pk__in=[v.pk for v in timedout_vals])
 
 
+class RotResultsView(ResultsView):
+	def get_context_data(self, **kwargs):
+		context = super(RotResultsView, self).get_context_data(**kwargs)
+		filteredUsers = self.getFilteredUsers()
+		csv = []
+		csv.append('group_target,group_comp,same2fold,same3fold,same4fold,same6fold,user_id,task_id,accuracy')
+		relResults = models.Result.objects.filter(selector__in=[user for user in filteredUsers])
+		for result in relResults:
+			target_group = result.task.test_image
+			comp_group = result.task.choice2 if result.task.test_image.group == result.task.choice1.group else result.task.choice1
+			same2fold = comp_group.has_rotation_group(2) == target_group.has_rotation_group(2)
+			same3fold = comp_group.has_rotation_group(3) == target_group.has_rotation_group(3)
+			same4fold = comp_group.has_rotation_group(4) == target_group.has_rotation_group(4)
+			same6fold = comp_group.has_rotation_group(6) == target_group.has_rotation_group(6)
+			correct = 1 if result.correct == 1 else 0
+			user_id = result.selector.pk
+			task_id = result.task.id
+			csv.append(target_group.group+","+comp_group.group+","+str(same2fold)+","+str(same3fold)+","+str(same4fold)+","+str(same6fold)+","+str(user_id)+","+str(task_id)+","+str(correct))
+		context['csv'] = csv
+		return context
+
+class ReflResultsView(ResultsView):
+	def get_context_data(self, **kwargs):
+		context = super(ReflResultsView, self).get_context_data(**kwargs)
+		filteredUsers = self.getFilteredUsers()
+		csv = []
+		csv.append('group_target,group_comp,T1_same,T2_same,D1_same,D2_same,user_id,task_id,accuracy')
+		relResults = models.Result.objects.filter(selector__in=[user for user in filteredUsers])	
+		for result in relResults:
+			target_group = result.task.test_image
+			comp_group = result.task.choice2 if result.task.test_image.group == result.task.choice1.group else result.task.choice1
+			T1_same = comp_group.get_T1() == target_group.get_T1()
+			T2_same = comp_group.get_T2() == target_group.get_T2()
+			D1_same = comp_group.get_D1() == target_group.get_D1()
+			D2_same = comp_group.get_D2() == target_group.get_D2()
+			correct = 1 if result.correct == 1 else 0
+			user_id = result.selector.pk
+			task_id = result.task.id
+			csv.append(target_group.group+","+comp_group.group+","+str(T1_same)+","+str(T2_same)+","+str(D1_same)+","+str(D2_same)+","+str(user_id)+","+str(task_id)+","+str(correct))
+		context['csv'] = csv
+		return context
+
 class FDResultsView(ResultsView):
 	template_name = "result.html"
 	def get_context_data(self, **kwargs):

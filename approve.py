@@ -1,6 +1,5 @@
 #!/usr/bin/env python2.6
 
-
 import os
 #for django 1.7:
 #import django
@@ -37,6 +36,8 @@ def print_totals():
     global total_bonus
     print(str(total_appr)+" workers approved.")
     print("Total bonus: $"+str(total_bonus))
+    if dry_run:
+        print("Dry run only.  Give -r or set dry_run to False for actual execution.")
     total_bonus = 0
     total_appr = 0
 
@@ -58,16 +59,19 @@ def approve_by_worker(worker):
 			#expected errors when in sandbox 
 			print("exception when approving: ")
 			print(e)
+        else:
+            print("Already approved: "+worker)
 	bonus = float(payout.bonus) / 100.0
 	if bonus>5:
 		print("bonus too high - rejected.")
 		return
 	bonus_price = price.Price(amount = bonus, currency_code="USD")
 	print("  Bonus "+str(bonus))
-	total_bonus += bonus
+
 	if (not dry_run and not paid_check):
 		try:
 			conn.grant_bonus(user.pk, user.assignment_id, bonus_price, "correct answers")
+                        total_bonus += bonus
                         paid = models.Paid(pk=worker, pay_date=timezone.now())
                         paid.save()
 		except connection.MTurkRequestError as e:

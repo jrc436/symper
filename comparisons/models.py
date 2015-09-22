@@ -64,6 +64,37 @@ class Image(models.Model):
 			return True
 		else:
 			return False
+	def get_T1(self):
+		if (self.group.lower() == Image.PM or self.group.lower() == Image.PMM or self.group.lower() == Image.P4M or self.group.lower() == Image.P31M or self.group.lower() == Image.P6M):
+			return "Y"
+		elif (self.group.lower() == Image.PG or self.group.lower() == Image.PMG or self.group.lower() == Image.PGG or self.group.lower() == Image.P4G):
+			return "G"
+		else:
+			return "N"
+	def get_T2(self):
+		gr = self.group.lower()
+		if (gr == Image.PMM or gr == Image.PMG or gr == Image.P4M or gr == Image.P31M or gr == Image.P6M):
+			return "Y"
+		elif (gr == Image.PGG or gr == Image.P4G):
+			return "G"
+		else:
+			return "N"
+
+	def get_D1(self):
+		gr = self.group.lower()
+		if (gr == Image.CM or gr == Image.CMM or gr == Image.P4M or gr == Image.P4G or gr == Image.P3M1 or gr == Image.P6M):
+			return "Y"
+		else:
+			return "N"
+
+	def get_D2(self):
+		gr = self.group.lower()
+		if (gr == Image.CMM or gr == Image.P4M or gr == Image.P4G or gr == Image.P6M):
+			return "Y"
+		else:
+			return "N"
+
+
 	def tile(self):
 		if self.group.lower() == Image.P1 or self.group.lower() == Image.P2:
 			return "oblique"
