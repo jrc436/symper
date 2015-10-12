@@ -192,6 +192,15 @@ class ResultsView(TemplateView):
 		unrandom_vals = validations.exclude(percentTop__gte=Decimal("0.6")).exclude(percentBottom__gte=Decimal("0.6"))
 		timedout_vals = unrandom_vals.exclude(percentTimeout__gte=Decimal("0.2"))
 		return clicked_corrects.filter(pk__in=[v.pk for v in timedout_vals])
+	def filterResults(self, filteredUsers):
+		exclude = set()
+		relResults = models.Result.objects.filter(selector__in=[user for user in filteredUsers])
+		for res in relResults:
+			for res2 in relResults:
+				if (res.pk not == res2.pk) and (res.selector.pk == res2.selector.pk) and (res.task.pk == res2.task.pk):
+					exclude.add(res2)
+		return relResults.exclude(pk__in=[item.pk for item in exclude])
+					
 
 
 class RotResultsView(ResultsView):
@@ -235,6 +244,33 @@ class ReflResultsView(ResultsView):
 			csv.append(target_group.group+","+comp_group.group+","+str(T1_same)+","+str(T2_same)+","+str(D1_same)+","+str(D2_same)+","+str(user_id)+","+str(task_id)+","+str(correct))
 		context['csv'] = csv
 		return context
+
+class AllResultsView(ResultsView):
+	def get_context_data(self, **kwargs):
+		context = super(AllResultsView, self).get_context_data(**kwargs)
+		filteredUsers = self.getFilteredUsers()
+		csv = []
+		csv.append('group_target,group_comp,tile_same,T1_same,T2_same,D1_same,D2_same,same2fold,same3fold,same4fold,same6fold,distance,user_id,task_id,accuracy')
+		relResults = self.filterResults(filteredUsers)
+		for result in relResults:
+			target_group = result.task.test_image
+			comp_group = result.task.choice2 if result.task.test_image.group == result.task.choice1.group else result.task.choice1
+			T1_same = comp_group.get_T1() == target_group.get_T1()
+			T2_same = comp_group.get_T2() == target_group.get_T2()
+			D1_same = comp_group.get_D1() == target_group.get_D1()
+			D2_same = comp_group.get_D2() == target_group.get_D2()
+			tile_same = tile_target == tile_comp
+			same2fold = comp_group.has_rotation_group(2) == target_group.has_rotation_group(2)
+			same3fold = comp_group.has_rotation_group(3) == target_group.has_rotation_group(3)
+			same4fold = comp_group.has_rotation_group(4) == target_group.has_rotation_group(4)
+			same6fold = comp_group.has_rotation_group(6) == target_group.has_rotation_group(6)
+			distance = target_group.distance(comp_group)
+			correct = 1 if result.correct == 1 else 0
+			user_id = result.selector.pk
+			task_id = result.task.pk
+			csv.append(target_group.group+","+comp_group.group+","+str(tile_same)+","+str(T1_same)+","+str(T2_same)+","+str(D1_same)+","+str(D2_same)+","+str(same2fold)+","+str(same3fold)+","+str(same4fold)+","+str(same6fold)+","+str(distance)+","+str(user_id)+","+str(task_id)+","+str(accuracy))
+		context['csv'] = csv
+		return context	
 
 class FDResultsView(ResultsView):
 	template_name = "result.html"
