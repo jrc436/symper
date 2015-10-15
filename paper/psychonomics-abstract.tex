@@ -1,0 +1,23 @@
+%There are several key pieces here that we need to hit on
+%Group-theoretic symmetry has been historically looked over in favor of more obvious forms of symmetry
+%Some have claimed that only bilateral reflection symmetry is relevant
+%Clarke, using a similar study, claimed that rotation symmetry is dominant
+%Yanxi's work focuses on group-theoretic symmetry... meaning that we want to show that the hierarchical organization of the groups themselves is most important
+%There are two basic ways to view the results we have: 
+%    1. We would like to show that a model with just distance has a lower AIC than a model with every feature, showing that distance *is* effective
+%	 	a. to be fair, we should probably "tune" that model to exclude features that is irrelevant, though this might cut into our results
+%		b. our argument then will be to say that human perception of symmetry is analogous to group theoretic symmety, whose main features were proven hundreds of years ago
+%	2. We would like to discuss the optimally tuned model, as found by the tuner
+%		a. We know this model includes features other than distance, why?
+%		b. Perhaps these types of symmetries are more prevalent in day to day life 
+\section{Introduction}
+This paper investigates human ability to innately perceive various features of visual symmetry. Many papers have focused exclusively on bilateral reflection symmetry, with some suggesting that it is the only type of symmetry humans can perceive \citep{bio}. We seek to demonstrate that humans can recognize every group theoretic symmetry in wallpapers (see \citet{yanxibook} for further explanation) and examine which features are most useful to do so.
+
+\section{Material and methods}
+We recruited 106 subjects on the Amazon Mechanical Turk platform. They compared three images, and chose an image on the right which they thought was more similar to the image on the left. Participants who exhibited problematic behaviors were pruned before analysis. Each subject performed 272 matches, every group compared to every group. We used a binomial test to determine if subjects could perceive the difference between the groups, and we used linear mixed effects regression to examine what features were most important. In addition to using the defining set of features to wallpapers, we used subgroup distance: the shortest path in the group hierarchy from one group to another.
+
+\section{Results and Conclusions}
+Our subjects could distinguish among every single wallpaper group. Every group comparison besides \textit{p4mm} vs. \textit{pmm} was significant at the p<0.05 level in accuracy, with that comparison being on the edge of significance. Our best linear mixed effects regression model included distance, 3-fold rotation, 4-fold rotation, and the T1 and D1 axes. Distance clearly has some role to play, and its lack of ability to tell the whole story could be based on which symmetries are most common.  
+
+
+\bibliography{symmetry,symmetry2,perception,yanxibook}
