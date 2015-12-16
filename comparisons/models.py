@@ -1,5 +1,6 @@
 from django.db import models
 from datetime import datetime
+from django.core.validators import MaxValueValidator, MinValueValidator
 #from util import Graph
 #from util import dijsktra
 #from util import all_dijsktra
@@ -146,6 +147,15 @@ class Validation(models.Model):
 	percentTop = models.DecimalField(max_digits = 3, decimal_places = 3)
 	percentBottom = models.DecimalField(max_digits = 3, decimal_places = 3)
 	percentTimeout = models.DecimalField(max_digits = 3, decimal_places = 3)	
+
+class Demographics(models.Model):
+	turk_id = models.CharField(primary_key=True, max_length=40)
+	GENDERS = ( ( "M", "Male"), ("F", "Female"), ("O", "Other") )
+	gender = models.CharField(max_length=1, choices=GENDERS)
+	age = models.PositiveSmallIntegerField(validators=[MaxValueValidator(120), MinValueValidator(1)])
+	education_years = models.PositiveSmallIntegerField(validators=[MinValueValidator(1),MaxValueValidator(25)])
+	languages = ( ( "EN", "English"), ("AR", "Arabic"), ("ES", "Spanish"), ("ZH", "Chinese"), ("JA", "Japanese"), ("FR", "French"), ("FA", "Farsi"), ("VI", "Vietnamese"), ("TL", "Tagalog"), ("DE", "German"), ("KO", "Korean"), ("RU", "Russian"), ("OT", "Other") )
+	first_language = models.CharField(max_length=2, choices=languages)
 
 class PUser(models.Model):
 	breakTime = models.NullBooleanField(default=False)

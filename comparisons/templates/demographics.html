@@ -1,0 +1,6 @@
+<p>Before starting, please take a moment to answer the following demographic questions.</p> <p>For years of education, please put 12 for completed high school, 16 for completed university, 18 for completed masters, and 21 for completed PhD. Otherwise, put the number of years that you have worked toward that degree without completing it.</p>
+<form method="post">
+{% csrf_token %}
+{{ form.as_p }}
+<input type="submit" value="Submit">
+</form>

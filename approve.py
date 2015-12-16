@@ -4,7 +4,6 @@ import os
 #for django 1.7:
 #import django
 import sys
-import getpass
 
 if __name__ == "__main__":
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "symper.settings")
@@ -14,16 +13,9 @@ from boto.mturk import connection, price
 from comparisons import models
 import datetime
 from django.utils import timezone
+from psu_conn import make_con 
 
-if getpass.getuser() == "dreitter":
-    from credentials.reitter import *
-else:
-    from credentials.cole import *
-
-#host = "mechanicalturk.sandbox.amazonaws.com"
-host = "mechanicalturk.amazonaws.com"
-
-conn = connection.MTurkConnection(aws_access_key_id=access, aws_secret_access_key=secret, host=host)
+conn = make_con()
 
 dry_run = True
 if "-r" in sys.argv:

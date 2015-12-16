@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.core.urlresolvers import reverse_lazy
 from django.http import HttpResponseRedirect
+from django.views.generic.edit import CreateView
 from comparisons import models
 import os, random, time, subprocess, decimal
 from symper import settings
@@ -13,12 +14,17 @@ from boto.mturk import connection
 from boto.mturk.price import Price
 from decimal import Decimal
 from django.db.models import Count, Max
+from django.forms import ModelForm
 
 class EndView(TemplateView):
 	template_name = 'end.html'
 	def dispatch(self, *args, **kwargs):
 		if ('turk_id' not in self.request.session or 'task' not in self.request.session):
 			return HttpResponseRedirect(reverse_lazy('intro'))
+		elif('demo' not in self.request.session):
+			return HttpResponseRedirect(reverse_lazy('demo'))
+		elif (models.PUser.objects.get(pk=self.request.session['turk_id']).taskset.getIncompleteTasks().all().count() > 0):
+			return HttpResponseRedirect(reverse_lazy('task'))
 		return super(EndView, self).dispatch(*args, **kwargs)
 	def get_context_data(self, **kwargs):
 		context = super(EndView, self).get_context_data(**kwargs)
@@ -59,12 +65,39 @@ class EndView(TemplateView):
 		pCor = float(correct) / float(correct + complete.filter(correct=0).count() + complete.filter(correct=2).count())
 		return max(0.0, round(4.0 * (pCor - 0.5), 2))
 
+class PartialCreateForm(ModelForm):
+	class Meta:
+		model = models.Demographics
+		exclude = ('turk_id',)
+class DemographicsView(CreateView):
+	#class Meta:
+	form_class = PartialCreateForm
+	model = models.Demographics
+	#exclude = ('turk_id',)
+	template_name = 'demographics.html'
+	def dispatch(self, *args, **kwargs):
+		if ('turk_id' not in self.request.session or 'task' not in self.request.session):
+			return HttpResponseRedirect(reverse_lazy('intro'))
+		elif('demo' in self.request.session):
+			return HttpResponseRedirect(reverse_lazy('task'))
+		return super(DemographicsView, self).dispatch(*args, **kwargs)
+	
+	#fields = ('gender', 'age', 'education_years', 'first_language',)
+	#exclude = ('turk_id',)
+	success_url = reverse_lazy('task')
+	def form_valid(self, form):
+		demo = models.Demographics(self.request.session['turk_id'], gender=form.cleaned_data['gender'], age=form.cleaned_data['age'], education_years=form.cleaned_data['education_years'], first_language=form.cleaned_data['first_language'])
+		demo.save()
+		self.request.session['demo']='done'
+		return HttpResponseRedirect(self.success_url)
 
 class IntroView(TemplateView):
 	template_name = 'intro.html'
 	def dispatch(self, *args, **kwargs):
-		if ('turk_id' in self.request.session and 'task' in self.request.session):
+		if ('turk_id' in self.request.session and 'demo' in self.request.session and 'task' in self.request.session):
                         return HttpResponseRedirect(reverse_lazy('task'))
+		elif ('turk_id' in self.request.session and 'task' in self.request.session):
+			return HttpResponseRedirect(reverse_lazy('demo'))
 		return super(IntroView, self).dispatch(*args, **kwargs)
 
 	def get(self, request):
@@ -174,15 +207,23 @@ class ResultsView(TemplateView):
 		csv.append("target,comparison,accuracy")
 		relResults = models.Result.objects.filter(selector__in=[user for user in filteredUsers])
 		for t in range(0,len(models.Image.GROUPS)):
-			for c in range(t+1,len(models.Image.GROUPS)):
+			totalCorrect = 0
+			fullTotal = 0
+			for c in range(0,len(models.Image.GROUPS)):
+				if (t == c):
+					continue
 				qset0 = relResults.filter(task__test_image__group = models.Image.GROUPS[t][0])
 				qset0r = relResults.filter(task__choice1__group = models.Image.GROUPS[t][0]) | relResults.filter(task__choice2__group = models.Image.GROUPS[t][0])
 				qset1 = qset0.filter(task__choice1__group = models.Image.GROUPS[c][0]) |  qset0.filter(task__choice2__group = models.Image.GROUPS[c][0])
 				qset1r = qset0r.filter(task__test_image__group = models.Image.GROUPS[c][0])
-				numCorrect = qset1.filter(correct = 1).count() + qset1r.filter(correct = 1).count()
-				totalNum = qset1.all().count() + qset1r.all().count()
-				accuracy = float(numCorrect) / float(totalNum) 
+				numCorrect = qset1.filter(correct = 1).count() #+ qset1r.filter(correct = 1).count()
+				totalNum = qset1.all().count() #+ qset1r.all().count()
+				fullTotal += totalNum
+				totalCorrect += numCorrect
+				accuracy = 1.0 - float(numCorrect) / float(totalNum)
 				csv.append(models.Image.GROUPS[t][0] + "," + models.Image.GROUPS[c][0] +"," + "%2.3f" % accuracy)
+			fullAccuracy = float(totalCorrect) / float(fullTotal)
+			csv.append(models.Image.GROUPS[t][0] + "," + models.Image.GROUPS[t][0]+","+"%2.3f" % fullAccuracy)
 		context['csv'] = csv
 		return context
 	def getFilteredUsers(self):
@@ -195,13 +236,33 @@ class ResultsView(TemplateView):
 	def filterResults(self, filteredUsers):
 		exclude = set()
 		relResults = models.Result.objects.filter(selector__in=[user for user in filteredUsers])
-		for res in relResults:
-			for res2 in relResults:
-				if (res.pk not == res2.pk) and (res.selector.pk == res2.selector.pk) and (res.task.pk == res2.task.pk):
-					exclude.add(res2)
-		return relResults.exclude(pk__in=[item.pk for item in exclude])
+		relativerResults = relResults.exclude(selector__pk__in=[res.selector.pk for res in relResults],task__pk__in=[res.task.pk for res in relResults])
+		return relativerResults
+		#for res in relResults:
+		#	for res2 in relResults:
+		#		if (not res.pk == res2.pk) and (res.selector.pk == res2.selector.pk) and (res.task.pk == res2.task.pk):
+		#			exclude.add(res2)
+		#return relResults.exclude(pk__in=[item.pk for item in exclude])
 					
 
+class McNemarView(ResultsView):
+	def get_context_data(self, **kwargs):
+		context = super(McNemarView, self).get_context_data(**kwargs)
+		filteredUsers = self.getFilteredUsers()
+		csv = []
+		csv.append('P6M,P6,P31M,P3M1,P3,P4G,P4M,P4,CMM,PGG,PMG,PMM,CM,PG,PM,P2,P1')
+		relResults = models.Result.objects.filter(selector__in=[user for user in filteredUsers])
+		for t in range(0,len(models.Image.GROUPS)):
+			resultChain = ''
+			for c in range(0,len(models.Image.GROUPS)):
+				qset0 = relResults.filter(task__test_image__group = models.Image.GROUPS[t][0])
+				qset1 = qset0.filter(task__choice1__group = models.Image.GROUPS[c][0]) | qset0.filter(task__choice2__group = models.Image.GROUPS[c][0])
+				numCorrect = qset1.filter(correct = 1).count()
+				resultChain = resultChain + str(numCorrect) + ','
+			csv.append(resultChain[:-1])
+			resultChain = ''
+		context['csv'] = csv
+		return context
 
 class RotResultsView(ResultsView):
 	def get_context_data(self, **kwargs):
@@ -250,7 +311,7 @@ class AllResultsView(ResultsView):
 		context = super(AllResultsView, self).get_context_data(**kwargs)
 		filteredUsers = self.getFilteredUsers()
 		csv = []
-		csv.append('group_target,group_comp,tile_same,T1_same,T2_same,D1_same,D2_same,same2fold,same3fold,same4fold,same6fold,distance,user_id,task_id,accuracy')
+		csv.append('group_target,group_comp,tile_same,T1_same,T2_same,D1_same,D2_same,same2fold,same3fold,same4fold,same6fold,distance,user_id,task_id,correct')
 		relResults = self.filterResults(filteredUsers)
 		for result in relResults:
 			target_group = result.task.test_image
@@ -259,7 +320,7 @@ class AllResultsView(ResultsView):
 			T2_same = comp_group.get_T2() == target_group.get_T2()
 			D1_same = comp_group.get_D1() == target_group.get_D1()
 			D2_same = comp_group.get_D2() == target_group.get_D2()
-			tile_same = tile_target == tile_comp
+			tile_same = target_group.tile() == comp_group.tile()
 			same2fold = comp_group.has_rotation_group(2) == target_group.has_rotation_group(2)
 			same3fold = comp_group.has_rotation_group(3) == target_group.has_rotation_group(3)
 			same4fold = comp_group.has_rotation_group(4) == target_group.has_rotation_group(4)
@@ -268,7 +329,7 @@ class AllResultsView(ResultsView):
 			correct = 1 if result.correct == 1 else 0
 			user_id = result.selector.pk
 			task_id = result.task.pk
-			csv.append(target_group.group+","+comp_group.group+","+str(tile_same)+","+str(T1_same)+","+str(T2_same)+","+str(D1_same)+","+str(D2_same)+","+str(same2fold)+","+str(same3fold)+","+str(same4fold)+","+str(same6fold)+","+str(distance)+","+str(user_id)+","+str(task_id)+","+str(accuracy))
+			csv.append(target_group.group+","+comp_group.group+","+str(tile_same)+","+str(T1_same)+","+str(T2_same)+","+str(D1_same)+","+str(D2_same)+","+str(same2fold)+","+str(same3fold)+","+str(same4fold)+","+str(same6fold)+","+str(distance)+","+str(user_id)+","+str(task_id)+","+str(correct))
 		context['csv'] = csv
 		return context	
 
@@ -310,6 +371,8 @@ class BreakView(TemplateView):
 	def dispatch(self, *args, **kwargs):
 		if ('turk_id' not in self.request.session or 'task' not in self.request.session):
 			return HttpResponseRedirect(reverse_lazy('intro'))
+		elif('demo' not in self.request.session):
+			return HttpResponseRedirect(reverse_lazy('demo'))
 		user = models.PUser.objects.get(pk = self.request.session['turk_id'])
 		if not user.breakTime:
 			return HttpResponseRedirect(reverse_lazy('task'))
@@ -328,6 +391,8 @@ class TaskView(TemplateView):
 	def dispatch(self, *args, **kwargs):
 		if ('turk_id' not in self.request.session or 'task' not in self.request.session):
 			return HttpResponseRedirect(reverse_lazy('intro'))
+		elif ('demo' not in self.request.session):
+			return HttpResponseRedirect(reverse_lazy('demo'))
 		if self.getNumTasks() == 0 or models.PUser.objects.get(pk=self.request.session['turk_id']).dead is True:
 			return HttpResponseRedirect(reverse_lazy('end'))
 		elif self.getNumTasks() == 136 and models.PUser.objects.get(pk=self.request.session['turk_id']).breakTime is False:
