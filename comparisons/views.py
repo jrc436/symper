@@ -232,17 +232,23 @@ class ResultsView(TemplateView):
 		validations = models.Validation.objects.filter(pk__in=[user.pk for user in clicked_corrects])
 		unrandom_vals = validations.exclude(percentTop__gte=Decimal("0.6")).exclude(percentBottom__gte=Decimal("0.6"))
 		timedout_vals = unrandom_vals.exclude(percentTimeout__gte=Decimal("0.2"))
-		return clicked_corrects.filter(pk__in=[v.pk for v in timedout_vals])
+		secondfilter = clicked_corrects.filter(pk__in=[v.pk for v in timedout_vals])
+		demographics = models.Demographics.objects.all()
+		thirdfilter = secondfilter.filter(pk__in=[dem.pk for dem in demographics])
+		return thirdfilter
 	def filterResults(self, filteredUsers):
 		exclude = set()
 		relResults = models.Result.objects.filter(selector__in=[user for user in filteredUsers])
-		relativerResults = relResults.exclude(selector__pk__in=[res.selector.pk for res in relResults],task__pk__in=[res.task.pk for res in relResults])
-		return relativerResults
-		#for res in relResults:
+		#relativerResults = relResults.exclude(selector__pk__in=[res.selector.pk for res in relResults],task__pk__in=[res.task.pk for res in relResults])
+		#relativerResults
+		dupes = models.Result.objects.none()
+		for res in relResults:
+			newDupes = relResults.filter(task__pk = res.task.pk).filter(selector__pk = res.selector.pk).exclude(pk=res.pk)
+			dupes = dupes | newDupes
 		#	for res2 in relResults:
 		#		if (not res.pk == res2.pk) and (res.selector.pk == res2.selector.pk) and (res.task.pk == res2.task.pk):
 		#			exclude.add(res2)
-		#return relResults.exclude(pk__in=[item.pk for item in exclude])
+		return relResults.exclude(dupes)
 					
 
 class McNemarView(ResultsView):

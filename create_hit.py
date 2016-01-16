@@ -28,8 +28,8 @@ def make_hit(num_subjects):
 	hit = get_comparisons(psu_conn.get_comparisons_layout())
 	conn.create_hit(title = hit.title, description=hit.description, keywords=hit.keywords, max_assignments=num_subjects, hit_layout=hit.layoutid, lifetime=7*days, duration=6*hours, approval_delay=2*days, reward=price.Price(amount=hit.reward),qualifications=get_worker_qualifications(95,100))
 
-for i in range(0,11):
+for i in range(0,3):
 	print("Creating HITs")
 	make_all_hits(9)
-	print("Waiting one hour.")
+	print("Waiting...")
 	time.sleep(1*hours)  # wait to prevent server overload 

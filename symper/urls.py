@@ -6,7 +6,7 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 
 urlpatterns = patterns('',
-        #url(r'^init/$', views.InitView.as_view(), name='init'),
+        url(r'^init/$', views.InitView.as_view(), name='init'),
 	#url(r'^inittasks/$', views.InitTasksView.as_view(), name='init2'),
 	#url(r'^initsets/$', views.InitTaskSetView.as_view(), name='init3'),
 	url(r'^intro/$', views.IntroView.as_view(), name='intro'),
@@ -17,10 +17,10 @@ urlpatterns = patterns('',
 	#url(r'^fdresults/$', views.FDResultsView.as_view(), name='fd_results'),
 	#url(r'^reflresults/$', views.ReflResultsView.as_view(), name='refl_results'),
 	#url(r'^rotresults/$', views.RotResultsView.as_view(), name='rot_results'),
-	#url(r'^results/$', views.McNemarView.as_view(), name='all_results'),
+	url(r'^results/$', views.AllResultsView.as_view(), name='all_results'),
 	url(r'^break/$', views.BreakView.as_view(), name='break'),
 #	url(r'^media/', None)
-	#url(r'^validate/$', views.ValidationView.as_view(), name='validate'),
+	url(r'^validate/$', views.ValidationView.as_view(), name='validate'),
 )
 urlpatterns += staticfiles_urlpatterns()
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
