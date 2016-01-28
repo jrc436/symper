@@ -1,0 +1,73 @@
+% 
+% Annual Cognitive Science Conference
+% Sample LaTeX Paper -- Proceedings Format
+% 
+
+% Original : Ashwin Ram (ashwin@cc.gatech.edu)       04/01/1994
+% Modified : Johanna Moore (jmoore@cs.pitt.edu)      03/17/1995
+% Modified : David Noelle (noelle@ucsd.edu)          03/15/1996
+% Modified : Pat Langley (langley@cs.stanford.edu)   01/26/1997
+% Latex2e corrections by Ramin Charles Nakisa        01/28/1997 
+% Modified : Tina Eliassi-Rad (eliassi@cs.wisc.edu)  01/31/1998
+% Modified : Trisha Yannuzzi (trisha@ircs.upenn.edu) 12/28/1999 (in process)
+% Modified : Mary Ellen Foster (M.E.Foster@ed.ac.uk) 12/11/2000
+% Modified : Ken Forbus                              01/23/2004
+% Modified : Eli M. Silk (esilk@pitt.edu)            05/24/2005
+% Modified : Niels Taatgen (taatgen@cmu.edu)         10/24/2006
+% Modified : David Noelle (dnoelle@ucmerced.edu)     11/19/2014
+
+%% Change "letterpaper" in the following line to "a4paper" if you must.
+
+\documentclass[10pt,letterpaper]{article}
+
+\usepackage{cogsci}
+\usepackage{pslatex}
+\usepackage{apacite}
+\usepackage{graphicx}
+
+\newcommand{\citet}[1]{\citeA{#1}}
+\newcommand{\citep}[1]{\cite{#1}}
+
+\title{How to Make a Proceedings Paper Submission}
+ 
+\author{{\large \bf Morton Ann Gernsbacher (MAG@Macc.Wisc.Edu)} \\
+  Department of Psychology, 1202 W. Johnson Street \\
+  Madison, WI 53706 USA
+  \AND {\large \bf Sharon J.~Derry (SDJ@Macc.Wisc.Edu)} \\
+  Department of Educational Psychology, 1025 W. Johnson Street \\
+  Madison, WI 53706 USA
+   \AND {\large \bf Sharon J.~Derry (SDJ@Macc.Wisc.Edu)} \\
+    Department of Educational Psychology, 1025 W. Johnson Street \\
+    Madison, WI 53706 USA}
+
+
+\begin{document}
+
+\maketitle
+
+
+\begin{abstract}
+Most literature on symmetry perception has focused on bilateral reflection symmetry with some suggesting that it is the only type of symmetry humans can perceive \citep{bio}. Using image stimuli generated from the mathematically well-defined seventeen wall paper groups, we seek to demonstrate that humans can discriminate various symmetries found in 2D wallpaper patterns \citep{yanxitrends}. Furthermore, we examine which features play an essential role in wallpaper pattern perception. We wanted to test the well-defined features of symmetry along with \textit{subgroup distance}, the shortest path between two groups in the group hierarchy. We found that all groups but one are distinguishable ($p<0.05$) and all are likely distinguishable ($p<0.1$). Further, we found that subgroup distance has a role to play in every interesting model, suggesting it may be a valid model of pattern perception.
+
+\textbf{Keywords:} 
+symmetry; visual perception; computational cognition
+\end{abstract}
+
+
+\input{introduction}
+\input{background}
+\input{review}
+\input{questions}
+\input{methods}
+\input{results}
+\input{discussion}
+\input{conclusion}
+\bibliographystyle{apacite}
+
+\setlength{\bibleftmargin}{.125in}
+\setlength{\bibindent}{-\bibleftmargin}
+
+\bibliography{symmetry,symmetry2,perception,yanxibook,statistics,statistics2,statistics3}
+
+
+\end{document}

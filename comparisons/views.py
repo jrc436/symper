@@ -174,15 +174,25 @@ class ResultsView(TemplateView):
 		csv.append("target,comparison,accuracy")
 		relResults = models.Result.objects.filter(selector__in=[user for user in filteredUsers])
 		for t in range(0,len(models.Image.GROUPS)):
-			for c in range(t+1,len(models.Image.GROUPS)):
-				qset0 = relResults.filter(task__test_image__group = models.Image.GROUPS[t][0])
-				qset0r = relResults.filter(task__choice1__group = models.Image.GROUPS[t][0]) | relResults.filter(task__choice2__group = models.Image.GROUPS[t][0])
-				qset1 = qset0.filter(task__choice1__group = models.Image.GROUPS[c][0]) |  qset0.filter(task__choice2__group = models.Image.GROUPS[c][0])
-				qset1r = qset0r.filter(task__test_image__group = models.Image.GROUPS[c][0])
-				numCorrect = qset1.filter(correct = 1).count() + qset1r.filter(correct = 1).count()
-				totalNum = qset1.all().count() + qset1r.all().count()
-				accuracy = float(numCorrect) / float(totalNum) 
-				csv.append(models.Image.GROUPS[t][0] + "," + models.Image.GROUPS[c][0] +"," + "%2.3f" % accuracy)
+			totalTotalNum = 0
+			totalCorrect = 0
+			for c in range(0,len(models.Image.GROUPS)):
+				if c == t:
+					pass
+				else:
+					qset0 = relResults.filter(task__test_image__group = models.Image.GROUPS[t][0])
+					qset0r = relResults.filter(task__choice1__group = models.Image.GROUPS[t][0]) | relResults.filter(task__choice2__group = models.Image.GROUPS[t][0])
+					qset1 = qset0.filter(task__choice1__group = models.Image.GROUPS[c][0]) |  qset0.filter(task__choice2__group = models.Image.GROUPS[c][0])
+					qset1r = qset0r.filter(task__test_image__group = models.Image.GROUPS[c][0])
+					numCorrect = qset1.filter(correct = 1).count() + qset1r.filter(correct = 1).count()
+					totalCorrect += numCorrect
+					totalNum = qset1.all().count() + qset1r.all().count()
+					totalTotalNum += totalNum
+					accuracy = float(numCorrect) / float(totalNum) 
+					csv.append(models.Image.GROUPS[t][0] + "," + models.Image.GROUPS[c][0] +"," + "%2.3f" % accuracy)
+			#now handle the c that = t
+			overallAccuracy = float(totalCorrect) / float(totalTotalNum)
+			csv.append(models.Image.GROUPS[t][0] + "," models.Image.GROUPS[t][0] + "," + "2.3f" % overallAccuracy
 		context['csv'] = csv
 		return context
 	def getFilteredUsers(self):

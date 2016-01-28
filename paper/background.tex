@@ -62,29 +62,31 @@ Every wallpaper has some set of these symmetries, which we will also refer to as
 
 \begin{table}[!ht]
 \centering
-\begin{tabular}{|l|c|c|c|c|}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{|l|c|c|c|c|c|c|c|c|c|}
 \hline
-Group & Reflection & Rotation Order & Glide Reflection & Tile Shape \\ \hline
-P6M & True & 6 & True & Hexagonal \\ \hline
-P6 & False & 6 & False & Hexagonal \\ \hline
-P31M & True & 3 & False & Hexagonal \\ \hline
-P3M1 & True & 3 & True & Hexagonal \\ \hline
-P3 & False & 3 & False & Hexagonal \\ \hline
-P4G & True & 4 & True & Square \\ \hline
-P4M & True & 4 & True & Square \\ \hline
-P4 & False & 4 & False & Square \\ \hline
-CMM & True & 2 & True & Rhombic \\ \hline
-PGG & False& 2& True& Rectangular \\ \hline
-PMM& True& 2& False& Rectangular \\ \hline
-PMG& True& 2& True& Rectangular \\ \hline
-CM & True& 1& True& Rhombic \\ \hline
-PG & False& 1& True& Rectangular \\ \hline
-PM& True& 1& False& Rectangular \\ \hline
-P2& False& 2& False& Oblique \\ \hline
-P1& False& 1& False& Oblique \\ \hline
-\end{tabular}
+Group & 2-fold & 3-fold & 4-fold & 6-fold & $T_1$ & $T_2$ & $D_1$ & $D_2$ &  tile \\ \hline
+P1 & F & F & F & F & None & None & None & None & O \\ \hline
+P2 & T & F & F & F & None & None & None & None & O \\ \hline
+PM & F & F & F & F & Refl & None & None & None & Re \\ \hline
+PG & F & F & F & F & Glide & None & None & None & Re \\ \hline
+CM & F & F & F & F & None & None & Refl & None & Rh \\ \hline
+PMM & T & F & F & F & Glide & Refl & None & None & Re \\ \hline
+PMG & T & F & F & F & Glide & Refl & None & None & Re \\ \hline
+PGG & T & F & F & F & Glide & Glide & None & None & Re \\ \hline
+CMM & T & F & F & F & None & None & Refl & Refl & Rh \\ \hline
+P4 & T & F & T & F & None & None& None & None & S \\ \hline
+P4M & T & F & T & F & Refl & Refl & Refl & Refl & S \\ \hline
+P4G & T & F & T & F & Glide & Glide & Refl & Refl & S \\ \hline
+P3 & F & T & F & F & None & None & None & None & H \\ \hline
+P3M1 & F & T & F & F & None & None & Refl& None & H \\ \hline
+P31M & F & T & F & F & Refl & Refl & Refl & None & H \\ \hline
+P6 & T & T & F & T & Refl & None & None & None & H \\ \hline
+P6M & T & T & F & T & Refl & Refl & Refl & Refl & H \\ \hline
+\end{tabular}%
+}
 \label{sym-tab}
-\caption{Wallpaper groups represented as their symmetries}
+\caption{Wallpaper groups represented as their symmetries. (Refl=Reflection, Glide=Glide Reflection, Re=Rectangular, Rh=Rhombic, O=Oblique, S=Square, H=Hexagonal)}
 \end{table}
 
 In representing wallpaper groups as a set of symmetries, we can then posit them in relation to each other. In this way, every group is either a subset or a superset of every other group.  If each group is placed with its relation to other groups, they form a graph, see Figure~\ref{graph}. If an arrow points from box $A$ toward box $B$, that means that $B$'s symmetries are subset of $A$'s symmetries.
