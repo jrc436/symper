@@ -241,14 +241,14 @@ class ResultsView(TemplateView):
 		relResults = models.Result.objects.filter(selector__in=[user for user in filteredUsers])
 		#relativerResults = relResults.exclude(selector__pk__in=[res.selector.pk for res in relResults],task__pk__in=[res.task.pk for res in relResults])
 		#relativerResults
-		dupes = models.Result.objects.none()
-		for res in relResults:
-			newDupes = relResults.filter(task__pk = res.task.pk).filter(selector__pk = res.selector.pk).exclude(pk=res.pk)
-			dupes = dupes | newDupes
+		#dupes = models.Result.objects.none()
+		#for res in relResults:
+		#	newDupes = relResults.filter(task__pk = res.task.pk).filter(selector__pk = res.selector.pk).exclude(pk=res.pk)
+		#	dupes = dupes | newDupes
 		#	for res2 in relResults:
 		#		if (not res.pk == res2.pk) and (res.selector.pk == res2.selector.pk) and (res.task.pk == res2.task.pk):
 		#			exclude.add(res2)
-		return relResults.exclude(dupes)
+		return relResults#.exclude(dupes)
 					
 
 class McNemarView(ResultsView):
