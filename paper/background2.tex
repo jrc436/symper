@@ -1,6 +1,4 @@
 \section{Background}
-\textit{Symmetry} can be thought of as a transformation on an object that leaves that object exactly the same. This could apply to a variety of objects: for instance, if someone has an infinitely long loop of musical notes, shifting all of the notes forward in time by the length of the loop would not change the music at all. However, this paper focuses on symmetry as it relates to two dimensional images.
-
 \begin{figure}
 \centering
 \includegraphics[width=0.9\columnwidth]{reflection}
@@ -8,10 +6,9 @@
 \caption{On the left, a face, exhibiting bilateral vertical reflection symmetry. On the right, a square, which contains four reflection axes. Reflection axes are marked with blue lines. Notice that mirroring the images about any of the axes would result in the same image}
 \end{figure}
 
-In two dimensional images, there are only four transformations that are not a simple composition of other transformations. These are \textit{reflection}, \textit{rotation}, \textit{glide reflection}, and \textit{translation}.
+In two dimensional images, there are only four transformations that are not a simple composition of other transformations. These are \textit{reflection}, \textit{rotation}, \textit{glide reflection}, and \textit{translation}. Various collections of these symmetries are what differentiate the seventeen wallpaper groups. We note that human perception does not necessarily rely on perfect symmetry. While textures which have been manipulated can pose a serious problem for computer vision algorithms, humans are quite good at recognizing patterns even in significantly distorted images \cite{nearregular}.  
 
 Reflection is the most well-known symmetry, with the vernacular for symmetry referring exclusively to it. It refers to when a line can be drawn on an image, and then every point on one side of the line has a corresponding point on the other side. The clearest examples of reflection symmetry in nature are probably the faces or bodies of animals. Reflection is often referred to by the number of reflection \textit{axes}, or lines, that the object contains. A face, for instance, would only contain one. A square, on the other hand, would contain three (See Figure~\ref{ref}).
-
 
 Rotation is another very common example of symmetry in nature. Rotation refers to an object's ability to rotate around some center without changing. Rotation symmetry is generally referred to by the number of rotation angles that maintain this symmetry. For instance, a hexagon has 6-fold rotation symmetry, while a flower with six pedals would have 6-fold rotation symmetry (See Figure~\ref{rot})
 
@@ -40,18 +37,14 @@ The last basic symmetry is glide reflection. While reflection refers to somethin
 \caption{On the left, footsteps exhibiting a glide reflection pattern. On the right, footsteps exhibiting a normal reflection pattern. Note that the two by definition cannot exist along the same axis.}
 \end{figure}
 
-In two dimensions, an infinitely large pattern that has translation symmetry is referred to as a \textit{wallpaper}. While all wallpapers have translational symmetry, they can still be divided based on their other symmetries, such as the axes they have reflection along. Interestingly, there are actually only seventeen real combinations of the set of symmetries \citep{wallpaper-proof}. Intuitively, this is because each tile must contain all of the other present symmetries then must also then fit together with an infinite number of tiles of the exact same type. 
-
 \begin{figure}[!ht]
 \centering
 \includegraphics[width=0.9\columnwidth]{ann_images}
-\label{P4GvP4M}
+\label{fig:P4GvP4M}
 \caption{On the left is P4M, on the right is P4G. In each, one tile is marked with its symmetries. Notice that P4M has reflection axes on its tile border, whereas P4G does not.}
 \end{figure}
 
-Every wallpaper has some set of these symmetries, which we will also refer to as features. Each of the seventeen unique combinations are referred to as a wallpaper \textit{group}, with each wallpaper belonging to exactly one group. The symmetric features that define these groups consist of the basic symmetries we've discussed: rotation, reflection, glide reflection, and translation. Each wallpaper group has some set of these features. Among rotation, only 1-fold, 2-fold, 3-fold, 4-fold, and 6-fold tiles are possible. This is simply because other shapes of tiles cannot fit together in an infinite pattern. Table~\ref{sym-tab} gives a basic description of the seventeen groups as a set of their features. While this set has the majority of groups with a unique set of features, those with an equivalent set can be differentiated in other ways, such as what axes in the tile their reflection axes are along. See Figure~\ref{P4GvP4M} for an example. Importantly, any P4M or P4G would have the exact same tile annotations, even if their appearance was different.See Figure~\ref{P4MvP4M} for an example.
-
-
+In the wallpaper groups, every group has translation symmetry and then a unique set of other symmetries. The seventeen groups comprise all possible sets. Table~\ref{sym-tab} gives a basic description of the seventeen groups as a set of their symmetries. Notably, sometimes even when both groups have reflection, they have it along different axes. See Figure~\ref{fig:P4GvP4M} for an example. Importantly, any single group would have the exact same symmetries, even if their appearance was different. See Figure~\ref{P4MvP4M} for an example. Every group also has its own \textit{tile shape}, which is the shape that repeats.
 
 \begin{figure}[!ht]
 \centering
@@ -89,4 +82,4 @@ P6M & T & T & F & T & Refl & Refl & Refl & Refl & H \\ \hline
 \caption{Wallpaper groups represented as their symmetries. (Refl=Reflection, Glide=Glide Reflection, Re=Rectangular, Rh=Rhombic, O=Oblique, S=Square, H=Hexagonal)}
 \end{table}
 
-In representing wallpaper groups as a set of symmetries, we can then posit them in relation to each other. In this way, every group is either a subset or a superset of every other group.  If each group is placed with its relation to other groups, they form a graph, see Figure~\ref{graph}. If an arrow points from box $A$ toward box $B$, that means that $B$'s symmetries are subset of $A$'s symmetries.
+In representing wallpaper groups as a set of symmetries, we can then posit them in relation to each other. In this way, every group's symmetries are either a subset or a superset of every other group.  If each group is placed with its relation to other groups, they form a graph, see Figure~\ref{graph}. If an arrow points from box $A$ toward box $B$, that means that $B$'s symmetries are subset of $A$'s symmetries.
