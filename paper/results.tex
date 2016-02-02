@@ -1,5 +1,5 @@
 \section{Analysis}
-Our two basic research questions were addressed individually.
+Our two basic questions were addressed individually.
 
 \subsection{Question 1}
 Technically, the data we collected were asymmetric; that is, we have separate data from when group $A$ serves as the target and group $B$ serves as the distracter than when group $A$ serves as the distracter and group $B$ serves as the target. See Figure~\ref{fullacc} for the non-symmetric accuracies. McNemar's test failed standard tests of significance $p > 0.1$, so we decided to pool the data. 
@@ -31,7 +31,9 @@ To answer our second question, we used a Linear Mixed Effects Regression (GLMM) 
 \item Subgroup distance, computed with Djikstra's algorithm. 
 \end{enumerate}
 
-We used two random effect variables: the participant and the specific task; while it would contain the same groups, the group being on the top or bottom might play some small role. While we could have iteratively designed a uniform test set avoiding this issue, random effects allow us to control for the variance our methodology caused.
+We included two random effect intercepts grouped by participant and the specific task (combined by-item and by-subject analysis).
 
+% THIS IS TOO MUCH DETAIL FOR A COGSCI PAPER
+ % while it would contain the same groups, the group being on the top or bottom might play some small role. While we could have iteratively designed a uniform test set avoiding this issue, random effects allow us to control for the variance our methodology caused.
 
-We found the best overall model by lowest AIC, from the pool of features described earlier. This model included distance, but additionally included the $T_1$ axis, which would correspond to bilateral reflection symmetry, the $D_1$ axis, which is the positive diagonal, along with 4-fold and 3-fold rotation. See Table~\ref{fixeff} for the fixed effects in a model including all possible features.
+The best model was identified according to Aikake Information Criterion (AIC), among the models using the pool of features described earlier. This best model included distance, but additionally included the $T_1$ axis, which would correspond to bilateral reflection symmetry, the $D_1$ axis, which is the positive diagonal, along with 4-fold and 3-fold rotation. See Table~\ref{fixeff} for the fixed effects in a model including all possible features.

@@ -19,34 +19,34 @@ tile & -0.07891 & 0.05556 & -1.420 & 0.1555 \\ \hline
 distance & 0.22420 & 0.01872 & 11.978 & $<2^{-16}$*** \\ \hline
 \end{tabular}
 \label{fixeff}
-\caption{Fixed Effects}
+\caption{Logistic Linear Mixed-Effects model predicting accuracy with by-item and by-subject random intercepts. }
 \end{table}
 
 In general, this paper advocates for a model of symmetry/pattern detection that is mathematically driven. We believe the subgroup distance to be one method for capturing the method humans perceive regularities. Importantly, it is not the only one and it may not even be the best one. By using Dijkstra's algorithm, we weighted each edge to be exactly equal. However, that's not necessarily the case. While "p1" and "p2" differ by exactly one symmetry (the 2-fold rotation), "p2" and "pgg" differ by three symmetries. Another possible view is to calculate the distance using the Hamming distance between each pair, rather than the relation graph. However, there are clearly multiple definitions of even the same mathematical model when it is operationalized for perception, which complicates the story.
 
 As the model containing only subgroup distance outperformed the other simple models, we find it likely that subgroup distance is the single most useful feature. However, it should be clear from our results displayed earlier that distance alone does not tell the whole story. Thus, we interpret the additional features in the converged model as having an overly important role in the process of pattern recognition. In other words, human perception might use some quick heuristics involving these symmetries instead of doing a full analysis. 
 
-\begin{table}
-\centering
-\resizebox{\columnwidth}{!}{%
-\begin{tabular}{|l|cccccccccc|}
-\hline
-(Intercept) & T1 & T2 & D1 & D2 & 2fold & 3fold & 4fold & 6fold & tile & distance  \\ \hline
-T1 & -0.191 &   & & & & & & & & \\ \hline
-T2 & -0.090 & -0.556 &  & & & & & & &  \\ \hline
-D1 & -0.216 & 0.111 & 0.040 & & & & & & & \\ \hline
-D2 & -0.051 & -0.005 & -0.137 & -0.572 & & & & & & \\ \hline
-2fold & -0.472 & 0.113 & -0.010 & 0.136 & -0.061 & & & & & \\ \hline
-3fold & -0.127 & 0.148 & -0.090 & 0.088 & 0.039 & -0.068 & & & & \\ \hline
-4fold & -0.464 & 0.179 & -0.121 & 0.172 & -0.245 & 0.160 & 0.237 & & &  \\ \hline
-6fold & -0.245 & 0.001 & 0.048 & 0.055 & -0.192 & 0.060 & -0.413 & 0.029 & & \\ \hline
-tile & -0.169 & -0.210 & 0.241 & -0.141 & 0.072 & 0.180 & -0.525 & -0.292 & 0.189 & \\ \hline
-distance & -0.713 & 0.052 & 0.082 & 0.046 & 0.116 & 0.405 & -0.029 & 0.296 & -0.026 & 0.350 \\ \hline
-\end{tabular}%
-}
-\label{corr}
-\caption{Correlation of Fixed Effects (note that this is the empirical correlation rather than the analytical relationship)}
-\end{table}
+% \begin{table}
+% \centering
+% \resizebox{\columnwidth}{!}{%
+% \begin{tabular}{|l|cccccccccc|}
+% \hline
+% (Intercept) & T1 & T2 & D1 & D2 & 2fold & 3fold & 4fold & 6fold & tile & distance  \\ \hline
+% T1 & -0.191 &   & & & & & & & & \\ \hline
+% T2 & -0.090 & -0.556 &  & & & & & & &  \\ \hline
+% D1 & -0.216 & 0.111 & 0.040 & & & & & & & \\ \hline
+% D2 & -0.051 & -0.005 & -0.137 & -0.572 & & & & & & \\ \hline
+% 2fold & -0.472 & 0.113 & -0.010 & 0.136 & -0.061 & & & & & \\ \hline
+% 3fold & -0.127 & 0.148 & -0.090 & 0.088 & 0.039 & -0.068 & & & & \\ \hline
+% 4fold & -0.464 & 0.179 & -0.121 & 0.172 & -0.245 & 0.160 & 0.237 & & &  \\ \hline
+% 6fold & -0.245 & 0.001 & 0.048 & 0.055 & -0.192 & 0.060 & -0.413 & 0.029 & & \\ \hline
+% tile & -0.169 & -0.210 & 0.241 & -0.141 & 0.072 & 0.180 & -0.525 & -0.292 & 0.189 & \\ \hline
+% distance & -0.713 & 0.052 & 0.082 & 0.046 & 0.116 & 0.405 & -0.029 & 0.296 & -0.026 & 0.350 \\ \hline
+% \end{tabular}%
+% }
+% \label{corr}
+% \caption{Correlation of Fixed Effects (note that this is the empirical correlation rather than the analytical relationship)}
+% \end{table}
 
 For instance, why are $T_1$ and $D_1$ significant (the vertical and positive diagonal axis), but not $T_2$ and $D_2$ (the horizontal and negative diagonal axis)? While it seems easy to attribute it to perception, it is important to realize there are substantial correlations among features in the wallpaper groups. In some cases, this should be obvious: if a wallpaper group has 6-fold rotation, it is guaranteed to have both 2-fold rotation and 3-fold rotation by the definition. In the case of the reflection axes, there are substantial correlations (about $0.5$) between $D_1$ and $D_2$ and between $T_1$ and $T_2$. Thus, while it's somewhat difficult to disentangle their independent effects, it seems clear that both $T_1$ and $D_1$ are at least more important, as the models including them instead of $T_2$ and $D_2$ perform better on the earlier discussed metrics. However, $D_2$ is also a significant predictor even considering $D_1$, while $T_2$ is not a significant predictor while considering $T_1$. A possible explanation for this could result in faces, with $D_1$ and $D_2$ representing faces at an angle. As mentioned earlier, there are some biological reasons for believing humans are adept at recognizing faces \cite{ffa}.     
 
