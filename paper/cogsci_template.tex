@@ -1,22 +1,5 @@
 % 
 % Annual Cognitive Science Conference
-% Sample LaTeX Paper -- Proceedings Format
-% 
-
-% Original : Ashwin Ram (ashwin@cc.gatech.edu)       04/01/1994
-% Modified : Johanna Moore (jmoore@cs.pitt.edu)      03/17/1995
-% Modified : David Noelle (noelle@ucsd.edu)          03/15/1996
-% Modified : Pat Langley (langley@cs.stanford.edu)   01/26/1997
-% Latex2e corrections by Ramin Charles Nakisa        01/28/1997 
-% Modified : Tina Eliassi-Rad (eliassi@cs.wisc.edu)  01/31/1998
-% Modified : Trisha Yannuzzi (trisha@ircs.upenn.edu) 12/28/1999 (in process)
-% Modified : Mary Ellen Foster (M.E.Foster@ed.ac.uk) 12/11/2000
-% Modified : Ken Forbus                              01/23/2004
-% Modified : Eli M. Silk (esilk@pitt.edu)            05/24/2005
-% Modified : Niels Taatgen (taatgen@cmu.edu)         10/24/2006
-% Modified : David Noelle (dnoelle@ucmerced.edu)     11/19/2014
-
-%% Change "letterpaper" in the following line to "a4paper" if you must.
 
 \documentclass[10pt,letterpaper]{article}
 
@@ -30,15 +13,13 @@
 
 \title{Human Visual Perception of Two-Dimensional Symmetry}
  
-\author{\large \bf Jeremy Cole {(Jrcole@Psu.Edu)} \\
-College of Information Sciences and Technology, The Pennsylvania State University \\
-University Park, PA 16802 USA
-\AND \large \bf David Reitter {(Reitter@Psu.Edu)} \\
-College of Information Sciences and Technology, The Pennsylvania State University \\
-University Park, PA 16802 USA
-  \AND \large \bf Yanxi Liu {(Yanxi@Cse.Psu.Edu)} \\
-  Department of Computer Science and Engineering, The Pennsylvania State University \\
-University Park, PA 16802 USA
+\author{\large \bf Jeremy Cole {(jrcole@psu.edu)}  ~~~\textnormal{and}
+  ~~~ \large \bf David Reitter {(reitter@psu.edu)}  \\
+College of Information Sciences and Technology \\
+  \AND \large \bf Yanxi Liu {(yanxi@cse.psu.edu)} \\
+  Department of Computer Science and Engineering \\
+\\
+The Pennsylvania State University, University Park, PA 16802, USA
 }
 
 \begin{document}
@@ -47,7 +28,7 @@ University Park, PA 16802 USA
 
 
 \begin{abstract}
-Most literature on symmetry perception has focused on bilateral reflection symmetry with some suggesting that it is the only type of symmetry humans can perceive \citep{bio}. Using image stimuli generated from the mathematically well-defined seventeen wallpaper groups, this study demonstrates that humans can discriminate various symmetries found in 2D wallpaper patterns \citep{yanxitrends}. Furthermore, the results demonstrate the features which contribute to wallpaper pattern perception. All wallpaper groups but one were found to be reliably distinguishable (p<0.05). Wallpapers can be arranged in a hierarchy. We propose a metric to quantify subgroup similarity using the shortest path in the hierarchy. This subgroup distance was found to be a factor in a likely model of pattern perception. 
+Most literature on symmetry perception has focused on bilateral reflection symmetry with some suggesting that it is the only type of symmetry humans can perceive \citep{bio}. Using image stimuli generated from the mathematically well-defined seventeen wallpaper groups, this study demonstrates that humans can discriminate various symmetries found in 2D wallpaper patterns \citep{yanxitrends}. Furthermore, the results demonstrate the features which contribute to wallpaper pattern perception. All wallpaper groups but one were found to be reliably distinguishable ($p<0.05$). Wallpapers can be arranged in a hierarchy. We propose a metric to quantify subgroup similarity using the shortest path in the hierarchy. This subgroup distance was found to be a factor in a likely model of pattern perception. 
 
 \textbf{Keywords:} 
 symmetry; visual perception; computational cognition
@@ -64,11 +45,11 @@ symmetry; visual perception; computational cognition
 \input{discussion}
 \input{conclusion}
 \bibliographystyle{apacite}
-
+{
+\renewcommand{\bibliographytypesize}{\small}
 \setlength{\bibleftmargin}{.125in}
 \setlength{\bibindent}{-\bibleftmargin}
-
 \bibliography{symmetry,symmetry2,symmetry3,perception,yanxibook,statistics,statistics2,statistics3}
-
+}
 
 \end{document}
