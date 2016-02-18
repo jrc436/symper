@@ -1,0 +1,127 @@
+\documentclass[final,hyperref={pdfpagelabels=false}]{beamer}
+\newcommand{\citet}[1]{\citeA{#1}}
+\newcommand{\citep}[1]{\cite{#1}}
+
+
+\mode<presentation>
+  {
+  \usetheme{pennstate}
+  %\usetheme{Dreuw}
+  }
+  \usepackage{times}
+  \usepackage{amsmath,amsthm, amssymb, latexsym, apacite}
+  \boldmath
+  \usepackage[english]{babel}
+  \usepackage[latin1]{inputenc}
+  \usepackage[orientation=portrait,width=24in,height=36in,debug]{beamerposter}
+
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%5
+  \graphicspath{{figures/}}
+  \title[Symmetry Perception]{Human Perception of Two Dimensional Symmetry}
+  \author[Cole \& Reitter \& Liu]{Jeremy Cole, David Reitter, and Yanxi Liu}
+  \institute[Penn State]{The Pennsylvania State University}
+  \date{2016}
+
+
+
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%5
+  \begin{document}
+  \begin{frame}{} 
+    \vfill
+    \begin{block}{\LARGE Abstract}
+      \input{abstract}
+    \end{block}    
+	\begin{columns}[t]
+	\begin{column}{.12\linewidth}
+	    	    		\begin{block}{Reflection}
+	    	    		 \input{reflection}
+	    	    		\end{block}
+	    	    		\vfill
+	    	    		\begin{block}{Rotation}
+	    	    		\input{rotation}
+	    	    		\end{block}
+	    	    	\end{column}
+	    	    	\begin{column}{.12\linewidth}
+	    	    		\begin{block}{Glide Reflection}
+	    	    			\input{glideref}				 
+	    		  		\end{block}
+	    		  			\vfill
+	    	    		\begin{block}{Translation}
+	    	    	    		\input{translation}  
+	    	    	    \end{block}
+	    	    	    	\end{column}
+		\begin{column}{0.48\linewidth}
+    		\input{introduction}
+    	\end{column}
+    		
+    	    	\begin{column}{.24\linewidth}
+    	   			 \input{groups}  
+    	    	\end{column}
+    \end{columns}
+    \vfill
+    
+    \begin{columns}[t]
+    \begin{column}{.32\linewidth}
+        	       		\begin{block}{Wallpaper Group Features}
+        	       		 	\input{symmetries}
+        	       		 \end{block}
+        	       		 
+        	       	\end{column}
+    	\begin{column}{.28\linewidth}
+    	\begin{block}{Methods}
+    	    	\input{experiment}
+    	    \end{block}
+    	\end{column}
+    	\begin{column}{.36\linewidth}
+    	\begin{block}{Task Screenshot}
+    		\input{methods}
+    	\end{block}
+    	\end{column}
+    		
+    \end{columns}
+    \begin{columns}[t]
+       \begin{column}{.31\linewidth}
+       \begin{block}{Wallpaper Hierarchy}
+               	      		 	\input{subgroups}
+               	       		\end{block}
+               	       		\begin{block}{Most Difficult Comparison}
+               	       		      			\input{difficult}
+               	       		      		\end{block}
+       \end{column}
+       	\begin{column}{.40\linewidth}
+       		\begin{block}{Accuracy Chart}
+      			\input{results}      			
+      		\end{block}
+      			\begin{block}{Bibliography}
+      		     			\bibliographystyle{apacite}
+      		     			\setbeamerfont{bibliography item}{size=\veryHuge}
+      		     			\setbeamerfont{bibliography entry author}{size=\veryHuge}
+      		     			\setbeamerfont{bibliography entry title}{size=\veryHuge}
+      		     			\setbeamerfont{bibliography entry location}{size=\veryHuge}
+      		     			\setbeamerfont{bibliography entry note}{size=\veryHuge}
+      		     			\renewcommand*{\bibliographytypesize}{\small}
+      		     			%\fontsize{42pt}{10pt}
+      		     			\bibliography{symmetry2,symmetry3,symmetry,perception,reflection,yanxibook}
+      		     		\end{block}
+      		
+       	\end{column}
+       	\begin{column}{.25\linewidth}
+      		\begin{block}{Fixed Effects}
+   				\input{fixeff}		
+     		\end{block}
+     		\begin{block}{Conclusions}
+     			\input{conclusions}
+     		\end{block}
+     	
+     	\end{column}
+    \end{columns}
+  \end{frame}
+
+\end{document}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-PDF-mode: t
+%%% End:
