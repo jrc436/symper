@@ -13,11 +13,11 @@
   \boldmath
   \usepackage[english]{babel}
   \usepackage[latin1]{inputenc}
-  \usepackage[orientation=portrait,width=24in,height=36in,debug]{beamerposter}
+  \usepackage[orientation=portrait,size=custom,width=60.96,height=91.44]{beamerposter}
 
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%5
   \graphicspath{{figures/}}
-  \title[Symmetry Perception]{Human Perception of Two Dimensional Symmetry}
+  \title[Symmetry Perception]{Human Perception of 2D Symmetry}
   \author[Cole \& Reitter \& Liu]{Jeremy Cole, David Reitter, and Yanxi Liu}
   \institute[Penn State]{The Pennsylvania State University}
   \date{2016}
@@ -28,9 +28,9 @@
   \begin{document}
   \begin{frame}{} 
     \vfill
-    \begin{block}{\LARGE Abstract}
-      \input{abstract}
-    \end{block}    
+    %\begin{block}{\LARGE Abstract}
+    %  \input{abstract}
+    %\end{block}    
 	\begin{columns}[t]
 	\begin{column}{.12\linewidth}
 	    	    		\begin{block}{Reflection}
@@ -42,7 +42,7 @@
 	    	    		\end{block}
 	    	    	\end{column}
 	    	    	\begin{column}{.12\linewidth}
-	    	    		\begin{block}{Glide Reflection}
+	    	    		\begin{block}{Glide Refl}
 	    	    			\input{glideref}				 
 	    		  		\end{block}
 	    		  			\vfill
@@ -50,13 +50,19 @@
 	    	    	    		\input{translation}  
 	    	    	    \end{block}
 	    	    	    	\end{column}
-		\begin{column}{0.48\linewidth}
+		\begin{column}{0.24\linewidth}
+			\begin{block}{Symmetry}
     		\input{introduction}
+    		\end{block}
     	\end{column}
-    		
     	    	\begin{column}{.24\linewidth}
     	   			 \input{groups}  
     	    	\end{column}
+    	  \begin{column}{0.24\linewidth}
+    	  	\begin{block}{Wallpapers}
+    	  		\input{wallpapers}
+    	  	\end{block}
+    	  \end{column}
     \end{columns}
     \vfill
     
@@ -67,12 +73,12 @@
         	       		 \end{block}
         	       		 
         	       	\end{column}
-    	\begin{column}{.28\linewidth}
+    	\begin{column}{.24\linewidth}
     	\begin{block}{Methods}
     	    	\input{experiment}
     	    \end{block}
     	\end{column}
-    	\begin{column}{.36\linewidth}
+    	\begin{column}{.40\linewidth}
     	\begin{block}{Task Screenshot}
     		\input{methods}
     	\end{block}
@@ -83,35 +89,34 @@
        \begin{column}{.31\linewidth}
        \begin{block}{Wallpaper Hierarchy}
                	      		 	\input{subgroups}
+               	      		 	%\begin{block}{Statistics}
+               	    			%\input{statistics}
+               	    			%\end{block}
                	       		\end{block}
                	       		\begin{block}{Most Difficult Comparison}
                	       		      			\input{difficult}
                	       		      		\end{block}
        \end{column}
-       	\begin{column}{.40\linewidth}
+       	\begin{column}{.35\linewidth}
        		\begin{block}{Accuracy Chart}
       			\input{results}      			
       		\end{block}
-      			\begin{block}{Bibliography}
-      		     			\bibliographystyle{apacite}
-      		     			\setbeamerfont{bibliography item}{size=\veryHuge}
-      		     			\setbeamerfont{bibliography entry author}{size=\veryHuge}
-      		     			\setbeamerfont{bibliography entry title}{size=\veryHuge}
-      		     			\setbeamerfont{bibliography entry location}{size=\veryHuge}
-      		     			\setbeamerfont{bibliography entry note}{size=\veryHuge}
-      		     			\renewcommand*{\bibliographytypesize}{\small}
-      		     			%\fontsize{42pt}{10pt}
-      		     			\bibliography{symmetry2,symmetry3,symmetry,perception,reflection,yanxibook}
-      		     		\end{block}
       		
+      			\begin{block}{Conclusions}
+      		     			\input{conclusions}
+      		     		\end{block}
+      		     	
        	\end{column}
-       	\begin{column}{.25\linewidth}
+       	\begin{column}{.30\linewidth}
       		\begin{block}{Fixed Effects}
    				\input{fixeff}		
      		\end{block}
-     		\begin{block}{Conclusions}
-     			\input{conclusions}
-     		\end{block}
+     			\begin{block}{Bibliography}
+     		      		     			\bibliographystyle{apacite}
+     		      		     			\renewcommand*{\bibliographytypesize}{\small}
+     		      		     			%\fontsize{42pt}{10pt}
+     		      		     			\bibliography{symmetry2,symmetry3,symmetry,perception,reflection,yanxibook}
+     		      		     		\end{block}
      	
      	\end{column}
     \end{columns}
