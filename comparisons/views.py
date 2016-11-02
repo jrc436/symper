@@ -159,6 +159,16 @@ class IntroView(TemplateView):
 		new_user.save()
 		return new_user 
 		
+def filteredUsers():
+                paidUsers = models.PUser.objects.filter(provisional=False)
+                clicked_corrects = paidUsers.annotate(Count('result')).exclude(result__count__lt=272).exclude(result__count__gte=340)
+                validations = models.Validation.objects.filter(pk__in=[user.pk for user in clicked_corrects])
+                unrandom_vals = validations.exclude(percentTop__gte=Decimal("0.6")).exclude(percentBottom__gte=Decimal("0.6"))
+                timedout_vals = unrandom_vals.exclude(percentTimeout__gte=Decimal("0.2"))
+                secondfilter = clicked_corrects.filter(pk__in=[v.pk for v in timedout_vals])
+                demographics = models.Demographics.objects.all()
+                thirdfilter = secondfilter.filter(pk__in=[dem.pk for dem in demographics])
+                return thirdfilter
 
 class ValidationView(TemplateView):
 	template_name = 'validation.html'
@@ -170,7 +180,7 @@ class ValidationView(TemplateView):
 		finishedUsers = paidUsers.filter(dead=True)
 		#newestUser = finishedUsers.latest('date')
 		#curUsers = finishedUsers.filter(hit_id = newestUser.hit_id) 
-		curUsers = finishedUsers
+		curUsers = filteredUsers();
 		userinfo = []
 		for user in curUsers:
 			complete = models.Result.objects.filter(selector=user)
@@ -202,10 +212,11 @@ class ResultsView(TemplateView):
 		#there are, effectively, 272 types of results.... so let's just progrma this shite
 		filteredUsers = self.getFilteredUsers()
 		#context['hitid'] = list(filteredUsers[:1])[0].hit_id
-		context['numParticipants'] = filteredUsers.count()
+		#context['numParticipants'] = filteredUsers.count()
 		csv = []
 		csv.append("target,comparison,accuracy")
-		relResults = models.Result.objects.filter(selector__in=[user for user in filteredUsers])
+		#relResults = models.Result.objects.filter(selector__in=[user for user in filteredUsers])
+		relResults = self.filterResults(getFilteredUsers())
 		for t in range(0,len(models.Image.GROUPS)):
 			totalCorrect = 0
 			fullTotal = 0
@@ -213,14 +224,14 @@ class ResultsView(TemplateView):
 				if (t == c):
 					continue
 				qset0 = relResults.filter(task__test_image__group = models.Image.GROUPS[t][0])
-				qset0r = relResults.filter(task__choice1__group = models.Image.GROUPS[t][0]) | relResults.filter(task__choice2__group = models.Image.GROUPS[t][0])
-				qset1 = qset0.filter(task__choice1__group = models.Image.GROUPS[c][0]) |  qset0.filter(task__choice2__group = models.Image.GROUPS[c][0])
-				qset1r = qset0r.filter(task__test_image__group = models.Image.GROUPS[c][0])
+				#qset0r = relResults.filter(task__choice1__group = models.Image.GROUPS[t][0]) | relResults.filter(task__choice2__group = models.Image.GROUPS[t][0])
+				qset1 = qset0.filter(task__choice1__group = models.Image.GROUPS[c][0]) #|  qset0.filter(task__choice2__group = models.Image.GROUPS[c][0])
+				#qset1r = qset0r.filter(task__test_image__group = models.Image.GROUPS[c][0])
 				numCorrect = qset1.filter(correct = 1).count() #+ qset1r.filter(correct = 1).count()
 				totalNum = qset1.all().count() #+ qset1r.all().count()
 				fullTotal += totalNum
 				totalCorrect += numCorrect
-				accuracy = 1.0 - float(numCorrect) / float(totalNum)
+				accuracy = float(numCorrect) / float(totalNum)
 				csv.append(models.Image.GROUPS[t][0] + "," + models.Image.GROUPS[c][0] +"," + "%2.3f" % accuracy)
 			fullAccuracy = float(totalCorrect) / float(fullTotal)
 			csv.append(models.Image.GROUPS[t][0] + "," + models.Image.GROUPS[t][0]+","+"%2.3f" % fullAccuracy)
@@ -234,7 +245,8 @@ class ResultsView(TemplateView):
 		timedout_vals = unrandom_vals.exclude(percentTimeout__gte=Decimal("0.2"))
 		secondfilter = clicked_corrects.filter(pk__in=[v.pk for v in timedout_vals])
 		demographics = models.Demographics.objects.all()
-		thirdfilter = secondfilter.filter(pk__in=[dem.pk for dem in demographics])
+		thirdfilter = secondfilter.exclude(pk__in=[dem.pk for dem in demographics])
+		#thirdfilter = secondfilter
 		return thirdfilter
 	def filterResults(self, filteredUsers):
 		exclude = set()

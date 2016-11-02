@@ -17,7 +17,7 @@ urlpatterns = patterns('',
 	#url(r'^fdresults/$', views.FDResultsView.as_view(), name='fd_results'),
 	#url(r'^reflresults/$', views.ReflResultsView.as_view(), name='refl_results'),
 	#url(r'^rotresults/$', views.RotResultsView.as_view(), name='rot_results'),
-	url(r'^results/$', views.AllResultsView.as_view(), name='all_results'),
+	url(r'^results/$', views.ResultsView.as_view(), name='all_results'),
 	url(r'^break/$', views.BreakView.as_view(), name='break'),
 #	url(r'^media/', None)
 	url(r'^validate/$', views.ValidationView.as_view(), name='validate'),

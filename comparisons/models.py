@@ -6,7 +6,8 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 #from util import all_dijsktra
 
 class Image(models.Model):
-	image = models.ImageField(upload_to = "sym_images")
+	#image = models.ImageField(upload_to = "sym_images")
+	image = models.ImageField()
 	P1 = "p1"
 	P2 = "p2"
 	PM = "pm"
@@ -168,6 +169,23 @@ class PUser(models.Model):
 	git_revision = models.CharField(max_length=30) #populated automatically with bash looking at the git revision num
 	provisional = models.BooleanField(default=True) #hit_id and turk_id are randomly generated
 
+class MemoryCheck(models.Model):
+	user = models.ForeignKey(PUser) #each user will have several memory checks 
+	user_correct = models.BooleanField(default=False)
+	answer = models.CharField(max_length=7)
+	user_input = models.CharField(max_length=7)
+	def takeInput(self, charString):
+		user_correct = charString == user_input
+		answer = charString
+			
+
+class MemoryCheckStore(models.Model):
+	result = models.ForeignKey(Result, unique=True) #each result has exactly 1 memorycheck it corresponds to
+	check = models.ForeignKey(MemoryCheck) #each memorycheck has N results it corresponds to
+	#For every result, there will be exactly one memorycheckstore, linking it to its memorycheck
+	#for every memorycheck, there will be N memorycheckstores, linking them indirectly to their results
+
+
 class Result(models.Model):
 	selector = models.ForeignKey(PUser)
 	task = models.ForeignKey(Task)
@@ -191,3 +209,5 @@ class Result(models.Model):
 		if (self.elapsedTime > 5):
 			self.correct = 0
 		self.save()
+	def memoryCorrect(self):
+		if models.MemoryCheckStore.objects.get(result=self).check.:
