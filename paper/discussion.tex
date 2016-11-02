@@ -1,0 +1,56 @@
+\section{Discussion}
+There are several results from our study that require some explanation to integrate with the literature. \citet{clarke} found that people have fairly high inaccuracy in matching the wallpaper groups together and that they seem to primarily rely on rotation in their strategy. However, Clarke's study relies on grouping images together. When presented with this task, it seems unlikely that most people would immediately choose to use seventeen groups. Indeed, the number of sets participants constructed varied wildly in Clarke's study, from 2 to 23 \citep{clarke}. This makes it somewhat difficult to analyze the actual strategy participants used. Further, if wallpaper images are to be sorted into a different number of groups, various strategies might make sense. For instance, rotation may be a logical method with six groups, as there are six types of rotation a wallpaper can have. Importantly, Clarke's allows participants an unlimited amount of time, so that they can employ analytical reasoning. Therefore, perception is not successfully isolated. Lastly, due to working memory constraints, it would be difficult for participants to recall precisely what type of image corresponded to each group as they continued to sort. These confounds could explain why their participants seemed to have significantly higher error rates than ours.
+
+\begin{table}
+\centering
+\begin{tabular}{|l|rrrl|}
+\hline
+& Estimate & Std. Error & z value & Pr$(<|z|)$  \\ \hline
+(Intercept) & 0.95971 &  0.09950 & 9.645 & $<2^{-16}$*** \\ \hline
+T1 & -0.24795 &  0.04150 & -5.975 & $2.30^{-9}$*** \\ \hline
+T2 & -0.07746 & 0.04026 & -1.924 & 0.0544 \\ \hline
+D1 & -0.31416 & 0.04063 & -7.732 & $1.06^{-14}$*** \\ \hline
+D2 & 0.10197 & 0.04431 & 2.301 & 0.0214* \\ \hline
+2fold & 0.01214 & 0.03540 & 0.343 & 0.7316 \\ \hline
+3fold & -0.18056 & 0.04197 & -4.302 & $1.69^{-5}$*** \\ \hline
+4fold & 0.32353 & 0.04282 & 7.555 & $4.19^{-14}$*** \\ \hline
+6fold & -0.07538 & 0.04484 & -1.711 & 0.0870 \\ \hline
+tile & -0.07891 & 0.05556 & -1.420 & 0.1555 \\ \hline
+distance & 0.22420 & 0.01872 & 11.978 & $<2^{-16}$*** \\ \hline
+\end{tabular}
+\caption{Logistic Linear Mixed-Effects model predicting accuracy with by-item and by-subject random intercepts. }
+\label{fixeff}
+\end{table}
+
+In general, this paper advocates for a mathematically driven model of symmetry/pattern detection. We believe the subgroup distance to be one method to capture how humans perceive regularities. Importantly, it is not the only method and it may not even be the best one. In computing our subgroup distance, we made every edge in the hierarchy to be of equal distance, and then we used Dijkstra's algorithm. However, that's not necessarily the only way. While P1 and P2 differ by exactly one symmetry (the 2-fold rotation), P2 and PGG differ by three symmetries. Another possible view is to calculate the distance using the Hamming distance between each pair, rather than using the relation graph. Thus, there are multiple ways to operationalize the same idea, which complicates our explanation.
+
+The model containing only subgroup distance outperformed the other simple models, so we find it likely that subgroup distance is the single most useful feature. However, it should be clear from our results that distance alone does not tell the whole story. Thus, we interpret the additional features in the converged model as having an important role in the process of pattern recognition compared to other symmetries. Human perception might use some quick heuristics involving these symmetries instead of doing a full analysis. 
+
+% \begin{table}
+% \centering
+% \resizebox{\columnwidth}{!}{%
+% \begin{tabular}{|l|cccccccccc|}
+% \hline
+% (Intercept) & T1 & T2 & D1 & D2 & 2fold & 3fold & 4fold & 6fold & tile & distance  \\ \hline
+% T1 & -0.191 &   & & & & & & & & \\ \hline
+% T2 & -0.090 & -0.556 &  & & & & & & &  \\ \hline
+% D1 & -0.216 & 0.111 & 0.040 & & & & & & & \\ \hline
+% D2 & -0.051 & -0.005 & -0.137 & -0.572 & & & & & & \\ \hline
+% 2fold & -0.472 & 0.113 & -0.010 & 0.136 & -0.061 & & & & & \\ \hline
+% 3fold & -0.127 & 0.148 & -0.090 & 0.088 & 0.039 & -0.068 & & & & \\ \hline
+% 4fold & -0.464 & 0.179 & -0.121 & 0.172 & -0.245 & 0.160 & 0.237 & & &  \\ \hline
+% 6fold & -0.245 & 0.001 & 0.048 & 0.055 & -0.192 & 0.060 & -0.413 & 0.029 & & \\ \hline
+% tile & -0.169 & -0.210 & 0.241 & -0.141 & 0.072 & 0.180 & -0.525 & -0.292 & 0.189 & \\ \hline
+% distance & -0.713 & 0.052 & 0.082 & 0.046 & 0.116 & 0.405 & -0.029 & 0.296 & -0.026 & 0.350 \\ \hline
+% \end{tabular}%
+% }
+% \label{corr}
+% \caption{Correlation of Fixed Effects (note that this is the empirical correlation rather than the analytical relationship)}
+% \end{table}
+$T_1$ and $D_1$ are significant predictors (which correspond to the vertical and positive diagonal axes) while $T_2$ and $D_2$ are not (which correspond to the the horizontal and negative diagonal axes)? This could be explained by perception: perhaps symmetries along these axes are more noticeable to humans. However, it is important to note that there are substantial correlations among the features. In some cases, this should be obvious: if a wallpaper group has 6-fold rotation, it is guaranteed to have both 2-fold rotation and 3-fold rotation by definition. In the case of the reflection axes, there are substantial correlations (about $0.5$) between $D_1$ and $D_2$ and between $T_1$ and $T_2$. Thus, while it's somewhat difficult to disentangle their independent effects, it seems clear that both $T_1$ and $D_1$ are at least more important, as the models including them instead of $T_2$ and $D_2$ have a lower AIC. However, $D_2$ is also a significant predictor even considering $D_1$, while $T_2$ is not a significant predictor while considering $T_1$. This could go back to faces: the diagonal axes $D_1$ and $D_2$ could represent faces at an angle. As mentioned earlier, there are biological reasons for believing humans are adept at recognizing faces \cite{ffa}.     
+
+In the case of rotation, the most significant features were 3-fold and 4-fold. Interestingly, the effect of 4-fold rotation is positive (if both groups both have 4-fold rotation or both don't, accuracy improves), while the effect of 3-fold rotation is negative. This means that groups with 4-fold rotation are not necessarily easy to determine from groups without it, but they are easy to tell apart internally. This is very possibly due to 4-fold rotation's correlation with the other features.
+
+For 3-fold rotation, it is possible that it plays a more significant role due to its lack of ubiquity. Many objects humans interact with in the modern world contain 4-fold rotation, to the point where perhaps it is so common that it is no longer a useful heuristic. On the other hand, 3-fold rotation is rarer, and thus may have some special significance.
+
+Lastly, distance was highly significant in all models. This could suggest that people perceive these patterns' similarity based on their relationships rather than any individual features. Computer vision has long been inspired by wallpaper groups \citep{yanxi1,yanxi2}, and this result lends further credence to the idea that they play some fundamental role in human perception.
