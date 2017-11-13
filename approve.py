@@ -1,5 +1,7 @@
 #!/usr/bin/env python2.6
 
+#from comparisons import models
+
 import os
 #for django 1.7:
 #import django
@@ -9,13 +11,21 @@ if __name__ == "__main__":
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "symper.settings")
     from django.conf import settings
     
+
+
+import sys
 from boto.mturk import connection, price
 from comparisons import models
 import datetime
 from django.utils import timezone
-from psu_conn import make_con 
 
-conn = make_con()
+from credentials.reitter import *
+#from credentials.cole import *
+
+host = "mechanicalturk.sandbox.amazonaws.com"
+host = "mechanicalturk.amazonaws.com"
+
+conn = connection.MTurkConnection(aws_access_key_id=access, aws_secret_access_key=secret, host=host)
 
 dry_run = True
 if "-r" in sys.argv:
@@ -24,51 +34,42 @@ total_bonus=0.0
 total_appr=0
 
 def print_totals():
-    global total_appr
-    global total_bonus
     print(str(total_appr)+" workers approved.")
     print("Total bonus: $"+str(total_bonus))
-    if dry_run:
-        print("Dry run only.  Give -r or set dry_run to False for actual execution.")
-    total_bonus = 0
-    total_appr = 0
 
 def approve_by_worker(worker):
 	global conn
-	global dry_run
-	global total_bonus
-        global total_appr
+        global dry_run
+        global total_bonus,total_appr
 	payout = models.Payout.objects.get(pk=worker)
 	user = models.PUser.objects.get(pk=worker)
-	paid_check = models.Paid.objects.filter(pk=worker).exists()
-	if not paid_check:
-		try:
-			print("Approving worker "+worker)
-			total_appr += 1
-			if not dry_run:
-				conn.approve_assignment(user.assignment_id)
-		except connection.MTurkRequestError as e:
-			#expected errors when in sandbox 
-			print("exception when approving: ")
-			print(e)
-        else:
-            print("Already approved: "+worker)
+	try:
+            print("Approving worker "+worker)
+            total_appr += 1
+            if not dry_run:
+		conn.approve_assignment(user.assignment_id)
+	except connection.MTurkRequestError as e:
+            print("exception when approving: ")
+            print(e)
+            #this seems to work, but throws a weird error?
+            pass
 	bonus = float(payout.bonus) / 100.0
-	if bonus>5:
-		print("bonus too high - rejected.")
-		return
+        if bonus>5:
+            print("bonus too high - rejected.")
+            return
+        if bonus==0:
+            return
 	bonus_price = price.Price(amount = bonus, currency_code="USD")
-	print("  Bonus "+str(bonus))
-
-	if (not dry_run and not paid_check):
-		try:
-			conn.grant_bonus(user.pk, user.assignment_id, bonus_price, "correct answers")
-                        total_bonus += bonus
-                        paid = models.Paid(pk=worker, pay_date=timezone.now())
-                        paid.save()
-		except connection.MTurkRequestError as e:
-			print("exception when bonusing: ")
-			print(e)
+        print("  Bonus "+str(bonus))
+        total_bonus += bonus
+        if not dry_run:
+            try:
+                conn.grant_bonus(user.pk, user.assignment_id, bonus_price, "correct answers")
+            except connection.MTurkRequestError as e:
+                print("exception when bonusing: ")
+                print(e)
+                #this seems to work, but throws a weird error?
+                pass
 
 def bonus_worker(worker, amount):
     pass
